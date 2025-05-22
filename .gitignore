@@ -30,3 +30,4 @@ Thumbs.db
 # Fichiers sensibles
 .env
 .env.*
+firebase-key.json
