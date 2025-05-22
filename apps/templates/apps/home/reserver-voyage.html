@@ -1,0 +1,50 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow p-4">
+                <h2 class="card-title mb-4">{{ voyage.titre }}</h2>
+
+                <p class="card-text">{{ voyage.description }}</p>
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item">
+                        <strong>Départ :</strong> {{ voyage.depart }} à {{ voyage.date_depart|date:"d/m/Y H:i" }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Arrivée :</strong> {{ voyage.arrivee }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Places disponibles :</strong> {{ voyage.places_disponibles }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Prix :</strong> {{ voyage.prix }} €
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Conducteur :</strong> {{ voyage.conducteur.username }}
+                    </li>
+                </ul>
+
+                {% if voyage.places_disponibles > 0 %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100">Réserver une place</button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-danger text-center" role="alert">
+                        Il n'y a plus de places disponibles pour ce voyage.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

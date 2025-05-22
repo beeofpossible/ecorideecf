@@ -1,0 +1,27 @@
+<h1>Gérer les Présentations Utilisateur</h1>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <button type="submit">{% if instance %}Modifier{% else %}Créer{% endif %}</button>
+</form>
+
+<hr>
+
+<h2>Présentations existantes</h2>
+<ul>
+  {% for pres in presentations %}
+    <li>
+      <strong>{{ pres.titre }}</strong> – {{ pres.sous_titre }}
+      <a href="{% url 'gestion_presentation_utilisateur' pres.id %}">Modifier</a>
+      <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="delete" value="{{ pres.id }}">
+        <button type="submit" onclick="return confirm('Supprimer cette présentation ?')">Supprimer</button>
+      </form>
+    </li>
+  {% empty %}
+    <li>Aucune présentation enregistrée.</li>
+  {% endfor %}
+</ul>

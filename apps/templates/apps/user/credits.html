@@ -1,0 +1,24 @@
+{% extends 'apps/layouts/base.html' %}
+{% block content %}
+<h2>Acheter des crédits</h2>
+<p>Crédits disponibles : {{ request.user.credit.montant }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  <label for="montant">Montant de crédits à acheter :</label>
+  <input type="number" name="montant" min="1" required><br><br>
+
+  <label for="moyen_paiement">Choisir un moyen de paiement :</label>
+  <select name="moyen_paiement" required>
+    {% for moyen in moyens_paiement %}
+      <option value="{{ moyen.id }}">{{ moyen }}</option>
+    {% empty %}
+      <option disabled>Aucun moyen de paiement disponible.</option>
+    {% endfor %}
+  </select><br><br>
+
+  <button type="submit">Acheter</button>
+</form>
+
+<p><a href="{% url 'apps:ajouter-moyen-paiement' %}">Ajouter un moyen de paiement</a></p>
+{% endblock %}

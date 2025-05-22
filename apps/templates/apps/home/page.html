@@ -1,0 +1,40 @@
+{% extends "apps/layouts/base.html" %}
+{% block content %}
+  <div class="page">
+    <!-- Image de couverture -->
+    {% if page.cover_image %}
+      <img src="{{ page.cover_image.url }}" alt="Image de couverture" class="cover-image">
+    {% endif %}
+    
+    <h1>{{ page.titre }}</h1>
+    <h2>{{ page.sous_titre }}</h2>
+    <p>{{ page.description_courte }}</p>
+
+    <div class="section">
+      <h3>{{ page.section_1_titre }}</h3>
+      <h4>{{ page.section_1_sous_titre }}</h4>
+      <p>{{ page.section_1_texte }}</p>
+      {% if page.section_1_image %}
+        <img src="{{ page.section_1_image.url }}" alt="Image de section 1">
+      {% endif %}
+    </div>
+
+    <div class="section">
+      <h3>{{ page.section_2_titre }}</h3>
+      <h4>{{ page.section_2_sous_titre }}</h4>
+      <p>{{ page.section_2_texte }}</p>
+      {% if page.section_2_image %}
+        <img src="{{ page.section_2_image.url }}" alt="Image de section 2">
+      {% endif %}
+    </div>
+
+    <div class="section">
+      <h3>{{ page.section_3_titre }}</h3>
+      <h4>{{ page.section_3_sous_titre }}</h4>
+      <p>{{ page.section_3_texte }}</p>
+      {% if page.section_3_image %}
+        <img src="{{ page.section_3_image.url }}" alt="Image de section 3">
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

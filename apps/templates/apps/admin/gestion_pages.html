@@ -1,0 +1,51 @@
+<h1>Gérer les Pages Ecoride</h1>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  
+  <h2>Créer ou modifier une page</h2>
+
+  {{ page_form.as_p }}
+
+  <script>
+    function toggleForms() {
+      const type = document.getElementById("id_type_page").value;
+      document.getElementById("utilisateur-form").style.display = (type === "utilisateurs") ? "block" : "none";
+      document.getElementById("temoignage-form").style.display = (type === "temoignages") ? "block" : "none";
+    }
+
+    window.addEventListener("DOMContentLoaded", toggleForms);
+    document.getElementById("id_type_page").addEventListener("change", toggleForms);
+  </script>
+
+  <div id="utilisateur-form" style="display:none;">
+    <h3>Données liées à un utilisateur</h3>
+    {{ presentation_form.as_p }}
+  </div>
+
+  <div id="temoignage-form" style="display:none;">
+    <h3>Données liées à un témoignage</h3>
+    {{ temoignage_form.as_p }}
+  </div>
+
+  <button type="submit">{% if page_instance %}Modifier{% else %}Créer{% endif %}</button>
+</form>
+
+<hr>
+
+<h2>Pages enregistrées</h2>
+<ul>
+  {% for page in pages %}
+    <li>
+      <strong>{{ page.titre }}</strong> ({{ page.get_type_page_display }}) — 
+      <a href="{% url 'gestion_pages' page.id %}">Modifier</a>
+      <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="delete" value="{{ page.id }}">
+        <button type="submit" onclick="return confirm('Supprimer cette page ?')">Supprimer</button>
+      </form>
+    </li>
+  {% empty %}
+    <li>Aucune page enregistrée.</li>
+  {% endfor %}
+</ul>

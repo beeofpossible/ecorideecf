@@ -1,0 +1,155 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4"><i class="fas fa-user-shield"></i> Espace Administrateur Principal</h2>
+
+    <div class="row">
+        <!-- Graphiques -->
+        <div class="col-md-6">
+            <div class="card p-3 mb-4">
+                <h5>Covoiturages par jour</h5>
+                <canvas id="chartCovoiturage"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 mb-4">
+                <h5>Crédits gagnés par jour</h5>
+                <canvas id="chartCredits"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total crédits -->
+    <div class="alert alert-success mt-3">
+        <strong>Total de crédits gagnés :</strong> {{ total_credit }} €
+    </div>
+
+    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">
+    Créer un compte employé
+    </button>
+
+    <!-- Comptes -->
+    <div class="card mt-4">
+        <div class="card-header"><i class="fas fa-users-cog"></i> Gestion des comptes</div>
+        <table class="table table-bordered mb-0">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Staff</th>
+                    <th>Actif</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.is_staff }}</td>
+                    <td>{{ user.is_active }}</td>
+                    <td>
+                        {% if user.is_active %}
+                        <a href="{% url 'apps:suspendre_utilisateur' user.id %}" class="btn btn-sm btn-danger">Suspendre</a>
+                        {% else %}
+                        <a href="{% url 'apps:reactiver_utilisateur' user.id %}" class="btn btn-sm btn-success">Réactiver</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODALE : Création d’un employé -->
+<div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="createEmployeeForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Créer un compte employé</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Nom d'utilisateur</label>
+            <input type="text" name="username" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label>Mot de passe</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Créer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = {{ labels|safe }};
+    const covData = {{ covoiturages_totaux|safe }};
+    const creditsData = {{ credits_montants|safe }};
+
+    new Chart(document.getElementById("chartCovoiturage"), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Covoiturages",
+                data: covData,
+                borderColor: 'blue',
+                fill: false
+            }]
+        }
+    });
+
+    new Chart(document.getElementById("chartCredits"), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Crédits (€)",
+                data: creditsData,
+                backgroundColor: 'green'
+            }]
+        }
+    });
+</script>
+
+<script>
+document.getElementById("createEmployeeForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+
+  fetch("{% url 'apps:creer_employe' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+    body: data
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert("Employé créé avec succès !");
+      location.reload();
+    } else {
+      alert("Erreur : " + data.error);
+    }
+  });
+});
+</script>
+
+{% endblock %}
+

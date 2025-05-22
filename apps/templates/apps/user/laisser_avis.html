@@ -1,0 +1,9 @@
+{% extends "apps/layouts/base.html" %}
+{% block content %}
+<h2>Laisser un avis</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Envoyer</button>
+</form>
+{% endblock %}

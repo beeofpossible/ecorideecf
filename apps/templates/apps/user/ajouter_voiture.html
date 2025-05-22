@@ -1,0 +1,102 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+
+        <!-- Sidebar 30% -->
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm p-3">
+                <h5 class="mb-3"><i class="fas fa-user-circle"></i> Menu utilisateur</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><a href="{% url 'apps:dashboard' %}"><i class="fas fa-home"></i> Tableau de bord</a></li>
+                    <li class="list-group-item"><a href="{% url 'apps:liste-voyages' %}"><i class="fas fa-car-side"></i> Covoiturages</a></li>
+                    <li class="list-group-item"><a href="{% url 'apps:creer-voyage' %}"><i class="fas fa-plus-circle"></i> Créer un voyage</a></li>
+                    <li class="list-group-item"><a href="{% url 'apps:messagerie' %}"><i class="fas fa-comments"></i> Messagerie</a></li>
+                    <li class="list-group-item"><a href="{% url 'apps:ajouter-moyen-paiement' %}"><i class="fas fa-credit-card"></i> Paiement</a></li>
+                    <li class="list-group-item"><a href="{% url 'apps:ajouter_voiture' %}"><i class="fas fa-car"></i> Ajouter un véhicule</a></li>
+                    <li class="list-group-item"><a href="{% url 'apps:signaler_litige' %}"><i class="fas fa-exclamation-triangle"></i> Signaler un litige</a></li>
+                    <li class="list-group-item"><a href="{% url 'apps:deconnexion' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contenu principal 70% -->
+        <div class="col-md-9">
+            <div class="card shadow-sm p-4">
+                <h2 class="mb-4"><i class="fas fa-car"></i> Ajouter un véhicule</h2>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-3">
+                        <label for="id_marque"><strong>Marque</strong></label>
+                        <select name="marque" id="id_marque" class="form-control" required>
+                            <option value="">-- Choisir une marque --</option>
+                            {% for marque in marques %}
+                                <option value="{{ marque }}">{{ marque }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="id_modele"><strong>Modèle</strong></label>
+                        <select name="modele" id="id_modele" class="form-control" required>
+                            <option value="">-- Choisir un modèle --</option>
+                        </select>
+                    </div>
+
+                    {% for field in form %}
+                        {% if field.name not in 'marque modele' %}
+                        <div class="form-group mb-3">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary mt-3"><i class="fas fa-check-circle"></i> Enregistrer le véhicule</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('id_marque').addEventListener('change', function() {
+  const marque = this.value;
+  const modeleSelect = document.getElementById('id_modele');
+  modeleSelect.innerHTML = '<option>Chargement...</option>';
+
+  fetch(`/get_modeles/?marque=${encodeURIComponent(marque)}`)
+    .then(res => res.json())
+    .then(data => {
+      modeleSelect.innerHTML = '';
+      if (data.modeles) {
+        modeleSelect.innerHTML = '<option value="">-- Choisir un modèle --</option>';
+        data.modeles.forEach(modele => {
+          const opt = document.createElement('option');
+          opt.value = modele;
+          opt.textContent = modele;
+          modeleSelect.appendChild(opt);
+        });
+      } else {
+        modeleSelect.innerHTML = '<option>Aucun modèle trouvé</option>';
+      }
+    })
+    .catch(() => {
+      modeleSelect.innerHTML = '<option>Erreur de chargement</option>';
+    });
+});
+</script>
+{% endblock %}
+
+    

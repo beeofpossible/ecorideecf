@@ -1,0 +1,56 @@
+<div class="banner d-flex justify-content-between align-items-center px-4 py-3 bg-dark text-white">
+    <div class="banner-text">
+        <p class="mb-0">Le<i class="fab fa-github"></i> github  du site est disponible</p>
+    </div>
+    <div class="banner-buttons d-flex align-items-center gap-3">
+        <a href="#" class="btn btn-success btn-sm"><i class="fab fa-github"></i>Github</a>
+        <a href="https://lucid.app/lucidchart/16dec8b7-af90-4ecc-9a48-d7b6349193b5/edit?viewport_loc=-11%2C-11%2C1468%2C683%2C0_0&invitationId=inv_282b3ab5-e249-44af-af69-85c5f5e7be54" class="btn btn-success btn-sm">Schéma UML</a>
+
+    <!-- Bouton -->
+    <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#modalInfosSite">
+    En savoir plus
+    </button>        
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+<div class="modal fade" id="modalInfosSite" tabindex="-1" aria-labelledby="modalInfosSiteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="modalInfosSiteLabel">À propos de ce site</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Ecoride</strong> est un projet étudiant afin de valider un diplôme. Ce site n'a pas vocation à être utilisé en l'état.</p>
+          <ul>
+              <li>🚗 La structure en front est réalisée à partir de boostrap, HTML, CSS et JS</li>
+              <li>🌍 L'architecture du site internet est faite à partir de l'ORM Django (python), PostgreSQL et Firebase </li>
+              <li>🤝 Tous les modèles sont inclus dans la structure du site internet. Le site est 100% responsive.</li>
+          </ul>
+          <p>Le site met en relation des conducteurs et des passagers, avec un système de réservation simple, sécurisé et rapide.</p>
+          <hr>
+          <p>Les identifiants administrateur sont les suivants</p>
+          <ul>
+            <li>
+                Identifiant : admin</li>
+                <li>Password : Secret123!
+            </li>
+          </ul>
+          <hr>
+          <p>Les identifiants utilisateurs sont les suivants</p>
+          <ul>
+            <li>
+                Identifiant : user</li>
+                <li>Password : Secret123!
+            </li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

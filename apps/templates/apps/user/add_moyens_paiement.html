@@ -1,0 +1,13 @@
+{% extends "apps/layouts/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Ajouter un moyen de paiement</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+    </form>
+</div>
+{% endblock %}
+
+    

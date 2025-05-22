@@ -1,0 +1,65 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<table style="width: 60%; background-color: #f0f0f0; border-collapse: collapse;">
+    <tbody>
+        <tr style="background-color: #2e7d32; color: white;">
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Champ</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Valeur</th>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Type de facture</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.get_type_facture_display }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Montant</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.montant }} €</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Date</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.date_facture }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Voiture</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
+                {{ facture.voiture.marque }} {{ facture.voiture.modele }} ({{ facture.voiture.immatriculation }})
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Voyage</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
+                {% if facture.voyage %}
+                    {{ facture.voyage.titre }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Description</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.description|linebreaksbr }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Document</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
+                {% if facture.document %}
+                    <a href="{{ facture.document.url }}" target="_blank">Télécharger</a>
+                {% else %}
+                    Aucun document
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p style="margin-top: 20px;">
+    <a href="{% url 'apps:liste_factures' %}">← Retour à la liste des factures</a>
+</p>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

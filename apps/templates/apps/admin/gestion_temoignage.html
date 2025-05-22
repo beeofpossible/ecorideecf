@@ -1,0 +1,27 @@
+<h1>Gérer les Témoignages</h1>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <button type="submit">{% if instance %}Modifier{% else %}Créer{% endif %}</button>
+</form>
+
+<hr>
+
+<h2>Témoignages existants</h2>
+<ul>
+  {% for temo in temoignages %}
+    <li>
+      <strong>{{ temo.titre }}</strong> – {{ temo.sous_titre }}
+      <a href="{% url 'gestion_temoignage' temo.id %}">Modifier</a>
+      <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="delete" value="{{ temo.id }}">
+        <button type="submit" onclick="return confirm('Supprimer ce témoignage ?')">Supprimer</button>
+      </form>
+    </li>
+  {% empty %}
+    <li>Aucun témoignage enregistré.</li>
+  {% endfor %}
+</ul>

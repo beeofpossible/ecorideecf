@@ -1,0 +1,11 @@
+{% extends "apps/layouts/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Signaler un litige</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-danger">Envoyer le litige</button>
+    </form>
+</div>
+{% endblock %}

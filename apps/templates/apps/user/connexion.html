@@ -1,0 +1,28 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Connexion</h2>
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger">{{ field.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'apps/layouts/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="alert alert-warning">
+    <h4>Confirmation de participation</h4>
+    <p>Vous êtes sur le point de participer à ce covoiturage. Cela vous coûtera <strong>2 crédits</strong>.</p>
+    <p>Crédits disponibles : <strong>{{ credit_disponible }}</strong></p>
+    <p>Êtes-vous sûr de vouloir continuer ?</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="confirm" value="1">
+      <button class="btn btn-success" type="submit">Oui, confirmer</button>
+      <a class="btn btn-secondary" href="{% url 'apps:liste-voyages' %}">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

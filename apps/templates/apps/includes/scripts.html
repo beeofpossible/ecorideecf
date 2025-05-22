@@ -1,0 +1,68 @@
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const miniatures = document.querySelectorAll('.profil-miniature');
+    const profilDetail = document.getElementById('profil-detail');
+
+    miniatures.forEach(function (card) {
+        card.addEventListener('click', function () {
+            // Supprimer l'état actif
+            document.querySelectorAll('.profil-miniature.active').forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+
+            // Données
+            const titre = this.dataset.titre;
+            const sousTitre = this.dataset.sousTitre;
+            const description = this.dataset.description;
+            const coverUrl = this.dataset.coverUrl;
+
+            profilDetail.innerHTML = `
+                <div class="card border-0 shadow-lg fade-in">
+                    ${coverUrl ? `<img src="${coverUrl}" class="card-img-top" alt="Image de couverture">` : ''}
+                    <div class="card-body">
+                        <h4 class="card-title">${titre}</h4>
+                        <h6 class="card-subtitle mb-2 text-muted">${sousTitre}</h6>
+                        <p class="card-text">${description}</p>
+                    </div>
+                </div>
+            `;
+        });
+    });
+});
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const setupAutocomplete = (inputId) => {
+            const input = document.getElementById(inputId);
+    
+            input.addEventListener("input", function() {
+                const query = input.value;
+                if (query.length < 3) return;
+    
+                fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&format=json&limit=5`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const datalistId = inputId + "_list";
+                        let datalist = document.getElementById(datalistId);
+                        if (!datalist) {
+                            datalist = document.createElement("datalist");
+                            datalist.id = datalistId;
+                            document.body.appendChild(datalist);
+                            input.setAttribute("list", datalistId);
+                        }
+                        datalist.innerHTML = "";
+                        data.forEach(place => {
+                            const option = document.createElement("option");
+                            option.value = place.display_name;
+                            datalist.appendChild(option);
+                        });
+                    });
+            });
+        };
+    
+        setupAutocomplete("depart");
+        setupAutocomplete("arrivee");
+    });
+    </script>

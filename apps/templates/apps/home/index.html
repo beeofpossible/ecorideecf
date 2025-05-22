@@ -1,0 +1,197 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+<!-- Section cover avec image à gauche et texte à droite -->
+<div class="cover-section container d-flex justify-content-center my-5">
+    
+  <div class="cover-wrapper d-flex align-items-center">
+    
+    <!-- Image à gauche -->
+    <div class="cover-image-left me-4">
+      <img 
+        src="{{ site.cover_image_url|default:site.cover_image_url }}" 
+        alt="Image de couverture" 
+        class="img-fluid rounded shadow"
+      >
+    </div>
+
+    <!-- Texte à droite -->
+    <div class="cover-text-right">
+      <h1 class="display-5">{{ site.titre }}</h1>
+      {% if site.sous_titre %}
+      <h4 class="text-muted mb-3">SOUS TITRE</h4>
+      {% endif %}
+      <p class="lead">{{ site.description }}</p>
+    </div>
+    
+  </div>
+</div>
+
+<!-- Zone formulaire de recherche avec fond vert foncé -->
+<div class="search-section p-4">
+  <div class="container">
+    <form method="get" action="{% url 'apps:liste-voyages' %}" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label for="depart" class="form-label">Ville de départ</label>
+        <input type="text" class="form-control" name="depart" id="depart" placeholder="Ex : Paris">
+      </div>
+      <div class="col-md-4">
+        <label for="arrivee" class="form-label">Ville d’arrivée</label>
+        <input type="text" class="form-control" name="arrivee" id="arrivee" placeholder="Ex : Lyon">
+      </div>
+      <div class="col-md-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" name="date" id="date">
+      </div>
+      <div class="col-md-1 text-end">
+        <button type="submit" class="btn btn-success w-100">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Nos utilisateurs</h2>
+
+    <!-- Miniatures -->
+    <div class="row g-2" id="profil-miniatures">
+        {% for profil in profils %}
+        <div class="col-6 col-sm-4 col-md-2">
+            <div class="card profil-miniature {% if forloop.first %}active{% endif %}"
+                 data-profil="{{ profil.id }}"
+                 data-titre="{{ profil.titre|escapejs }}"
+                 data-sous-titre="{{ profil.sous_titre|escapejs }}"
+                 data-description="{{ profil.description_courte|escapejs }}"
+                 data-cover-url="{% if profil.cover_image %}{{ profil.cover_image.url }}{% elif profil.cover_image_url %}{{ profil.cover_image_url }}{% endif %}">
+
+                {% if profil.miniature_image %}
+                    <img src="{{ profil.miniature_image.url }}" class="card-img-top img-thumbnail" style="max-height: 150px; object-fit: cover;" alt="{{ profil.titre }}">
+                {% elif profil.miniature_image_url %}
+                    <img src="{{ profil.miniature_image_url }}" class="card-img-top img-thumbnail" style="max-height: 150px; object-fit: cover;" alt="{{ profil.titre }}">
+                {% endif %}
+                <div class="card-img-overlay d-flex align-items-center justify-content-center overlay-hover">
+                    <h5 class="card-title text-white text-center">{{ profil.titre }}</h5>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+<!-- Super card du profil sélectionné -->
+<div class="mt-4 d-flex justify-content-center" id="profil-detail">
+  {% with premier_profil=profils.0 %}
+  <div class="card border-0 shadow-lg d-flex flex-row" style="max-width: 800px; width: 70%;">
+    
+    <!-- Texte à gauche -->
+    <div class="card-body" style="flex: 1;">
+      <h4 class="card-title">{{ premier_profil.titre }}</h4>
+      <h6 class="card-subtitle mb-2 text-muted">{{ premier_profil.sous_titre }}</h6>
+      <p class="card-text">{{ premier_profil.description_courte }}</p>
+    </div>
+
+    <!-- Image à droite -->
+    {% if premier_profil.cover_image %}
+      <img src="{{ premier_profil.cover_image.url }}" alt="Image de couverture" 
+           class="img-cover">
+    {% elif premier_profil.cover_image_url %}
+      <img src="{{ premier_profil.cover_image_url }}" alt="Image de couverture" 
+           class="img-cover">
+    {% endif %}
+  </div>
+  {% endwith %}
+</div>
+
+<!-- Section Avantages -->
+<div class="site-info container mt-5">
+    <h2 class="text-center mb-4 fw-bold">Nos avantages</h2>
+    <div class="row">
+        {% for avantage in site.get_avantages %}
+            <div class="col-md-4 mb-4">
+                <div class="d-flex align-items-start">
+                    {% if avantage.icone %}
+                        <i class="{{ avantage.icone }} me-3 fs-2 text-success"></i>
+                    {% endif %}
+                    <div>
+                        <h5 class="fw-bold mb-1">{{ avantage.avantage }}</h5>
+                        <p class="mb-0">{{ avantage.description }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container my-5 section-presentation">
+  <div class="row align-items-center">
+    <!-- Image à gauche -->
+    <div class="col-md-6 image-container">
+      <img src="{% static 'img/ecoride.jfif' %}" 
+           alt="Image de présentation" 
+           class="img-fluid">
+    </div>
+
+    <!-- Texte à droite -->
+    <div class="col-md-6 text-container">
+      <h2>Besoin d'un plein ?</h2>
+      <h4>Ecoride rembourse vos cents premiers euros dépensés</h4>
+      <p>
+        Ecoride, soucieux de l'environnement, met en place le chèque éco-malin : sur vos trajets, nous vous remboursons vos cent premiers euros de dépensés ! 
+        <br> Et en plus ? Nous vous offrons l'accompagnement sur
+         l'achat d'une voiture écologique ! Profitez des primes gouvernementales, EcoRide vous accompagne. 
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Voyages populaires -->
+<div class="container mt-5">
+    <h2 class="mb-4">Trajets les plus populaires</h2>
+    <div class="row">
+        {% for voyage in voyages_populaires %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ voyage.depart }} → {{ voyage.arrivee }}</h5>
+                        <p class="card-text">
+                            <strong>Prix :</strong> {{ voyage.prix }} €<br>
+                            <strong>Prochaine date :</strong> {{ voyage.date|date:"d/m/Y H:i" }}<br>
+                            <small class="text-muted">{{ voyage.total }} trajets similaires</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>Aucun trajet populaire pour les jours à venir.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="container my-5 d-flex justify-content-center">
+  <div class="d-flex" style="width: 80%; max-width: 1000px;">
+
+    <!-- Image à gauche (40%) -->
+    <div style="flex: 0 0 40%; margin-right: 20px;">
+      <img src="{% static 'img/aide.jfif' %}" alt="Besoin d'aide ?" class="img-fluid rounded shadow" style="width: 100%; height: auto;">
+    </div>
+
+    <!-- Texte à droite (40%) -->
+    <div style="flex: 0 0 40%; display: flex; flex-direction: column; justify-content: center;">
+      <h2 class="fw-bold">Besoin d'aide ?</h2>
+      <p class="lead">Ecoride intervient 24h/24 pour vous accompagner.</p>
+    </div>
+
+  </div>
+</div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

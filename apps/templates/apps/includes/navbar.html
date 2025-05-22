@@ -1,0 +1,50 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark px-4">
+  <a class="navbar-brand d-flex align-items-center" href="{% url 'apps:home' %}">
+    <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo-img">
+    <span class="ms-2 fw-bold">{{ site.titre }}</span>
+  </a>
+
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse justify-content-end" id="mainNavbar">
+    <ul class="navbar-nav align-items-center">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'apps:home' %}">Accueil</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'apps:liste-voyages' %}">Covoiturages</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'apps:contact' %}">Contact</a>
+      </li>
+
+      {% if user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-user me-1"></i> {{ user.username }} 
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            {% if user.is_superuser %}
+              <li><a class="dropdown-item" href="{% url 'apps:espace_admin' %}">Espace Administrateur</a></li>
+            {% elif user.is_staff %}
+              <li><a class="dropdown-item" href="{% url 'apps:espace_staff' %}">Espace Employé</a></li>
+            {% else %}
+              <li><a class="dropdown-item" href="{% url 'apps:dashboard' %}">Espace Utilisateur</a></li>
+            {% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="{% url 'apps:deconnexion' %}"><i class="fa-solid fa-power-off me-1"></i> Déconnexion</a></li>
+          </ul>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="btn btn-success btn-sm nav-link text-white px-3" href="{% url 'apps:connexion' %}">
+            <i class="fa-solid fa-power-off me-1"></i> Connexion
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

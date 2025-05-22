@@ -1,0 +1,23 @@
+{% block content %}
+  <div class="presentation">
+    {% if page.cover_image %}
+      <img src="{{ page.cover_image.url }}" alt="Cover Image" class="cover-image">
+    {% endif %}
+
+    <h1>{{ page.titre }}</h1>
+    <h2>{{ page.sous_titre }}</h2>
+    <p>{{ page.description_courte }}</p>
+
+    <h3>{{ page.raison_1_titre }}</h3>
+    <p>{{ page.raison_1_description }}</p>
+    {% if page.raison_1_icone %}
+      <i class="{{ page.raison_1_icone }}"></i>
+    {% endif %}
+    {% if page.raison_1_image %}
+      <img src="{{ page.raison_1_image.url }}" alt="Raison 1 Image">
+    {% endif %}
+
+    <!-- Répéter pour raison_2 et raison_3 -->
+
+  </div>
+{% endblock %}

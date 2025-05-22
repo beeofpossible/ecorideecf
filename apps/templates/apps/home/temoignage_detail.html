@@ -1,0 +1,21 @@
+{% block content %}
+  <div class="temoignage">
+    {% if temoignage.cover_image %}
+      <img src="{{ temoignage.cover_image.url }}" alt="Cover Image" class="cover-image">
+    {% endif %}
+
+    <h1>{{ temoignage.titre }}</h1>
+    <h2>{{ temoignage.sous_titre }}</h2>
+
+    <div class="temoignage-section">
+      <h3>{{ temoignage.temoignage_1_titre }}</h3>
+      <h4>{{ temoignage.temoignage_1_sous_titre }}</h4>
+      <p>{{ temoignage.temoignage_1_texte }}</p>
+      {% if temoignage.temoignage_1_image %}
+        <img src="{{ temoignage.temoignage_1_image.url }}" alt="Temoignage 1 Image">
+      {% endif %}
+    </div>
+
+    <!-- Répéter pour temoignage_2 et temoignage_3 -->
+  </div>
+{% endblock %}
