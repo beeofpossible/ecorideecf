@@ -156,7 +156,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Variables
 GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
-GS_CREDENTIALS_PATH = os.environ.get("GS_CREDENTIALS_PATH")
+GS_CREDENTIALS_PATH = os.environ.get(os.path.join(BASE_DIR, "GS_CREDENTIALS_PATH"))
+GS_CREDENTIAL_PATH = os.environ.get("GS_CREDENTIALS_PATH")
 
 # Configuration Firebase Storage
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
@@ -164,7 +165,7 @@ MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Charger les credentials
-cred = credentials.Certificate(GS_CREDENTIALS_PATH)
+cred = credentials.Certificate(GS_CREDENTIAL_PATH)
 
 # Initialiser Firebase
 firebase_admin.initialize_app(cred)
