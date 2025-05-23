@@ -111,6 +111,38 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('#star-filter .star-icon');
+    const inputNoteMin = document.getElementById('note_min');
+    let noteMin = parseInt(inputNoteMin.value) || 0;
+
+    function updateStars(value) {
+        stars.forEach((star, idx) => {
+            if (idx < value) {
+                star.classList.remove('fa-star-o');
+                star.classList.add('fa-star');
+                star.style.color = '#ffc107'; // jaune
+            } else {
+                star.classList.add('fa-star-o');
+                star.classList.remove('fa-star');
+                star.style.color = '#ccc';
+            }
+        });
+    }
+
+    updateStars(noteMin);
+
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            noteMin = parseInt(star.getAttribute('data-value'));
+            inputNoteMin.value = noteMin;
+            updateStars(noteMin);
+        });
+    });
+});
+</script>
+
+<script>
     document.addEventListener("DOMContentLoaded", function() {
         const setupAutocomplete = (inputId) => {
             const input = document.getElementById(inputId);

@@ -27,6 +27,9 @@ from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models.functions import TruncDate
 
+def uml(request):
+    return(render, "apps/home/diagramme-uml.html")
+
 def superuser_required(view_func):
     return user_passes_test(lambda u: u.is_superuser)(view_func)
 
@@ -371,20 +374,31 @@ def geocode_city(city_name):
         return float(results[0]['lat']), float(results[0]['lon'])
     return None
         
-
 def liste_voyages(request):
     site = Site.objects.first()
-    voyages_qs = Voyage.objects.annotate(moyenne_avis=Avg('avis__note')).order_by('-date_depart')
+    voyages_qs = Voyage.objects.annotate(
+        moyenne_avis=Avg('avis__note'),
+        nb_avis_conducteur=Count('conducteur__voyages__avis')
+    ).order_by('-date_depart')
 
     depart = request.GET.get('depart')
     arrivee = request.GET.get('arrivee')
     date = request.GET.get('date')
     ecologique = request.GET.get('ecologique')
     rayon = request.GET.get('rayon')
+    conducteur_avec_avis = request.GET.get('conducteur_avec_avis')  # Nouveau filtre
 
+    # Filtrer voyages écologiques ou non
     if ecologique == 'on':
         voyages_qs = voyages_qs.filter(ecologique=True)
-    
+    elif ecologique == 'off':
+        voyages_qs = voyages_qs.filter(ecologique=False)
+
+    # Filtrer uniquement voyages dont le conducteur a au moins un avis
+    if conducteur_avec_avis == 'on':
+        # Garder que les voyages dont le conducteur a au moins un avis sur ses voyages
+        voyages_qs = voyages_qs.filter(nb_avis_conducteur__gt=0)
+
     if date:
         voyages_qs = voyages_qs.filter(date_depart__date=date)
 
@@ -407,6 +421,15 @@ def liste_voyages(request):
     if arrivee:
         voyages_qs = voyages_qs.filter(arrivee__icontains=arrivee)
 
+    note_min = request.GET.get('note_min')
+    if note_min:
+        try:
+            note_min = int(note_min)
+            if 1 <= note_min <= 5:
+                voyages_qs = voyages_qs.filter(moyenne_avis__gte=note_min)
+        except ValueError:
+            pass
+    
     paginator = Paginator(voyages_qs, 6)
     page_number = request.GET.get('page')
     voyages = paginator.get_page(page_number)

@@ -6,6 +6,7 @@ from django.conf import settings
 app_name = "apps"
 
 urlpatterns = [
+    path('diagramme-uml', views.uml, name="uml")
     path('', views.index, name='home'),
     path("contact", views.contact, name="contact"),
     path('dashboard/', views.dashboard_view, name='dashboard'),

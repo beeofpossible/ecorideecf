@@ -3,42 +3,40 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')  # Remplace par
 import django
 django.setup()
 
-from django.contrib.auth.models import User
-from apps.models import ProfilUtilisateur
+from apps.models import Voyage
+from django.utils import timezone
 import random
 
-# Supprimer d'abord les profils associés
-ProfilUtilisateur.objects.filter(utilisateur__username__startswith="user_").delete()
-
-# Puis supprimer les utilisateurs eux-mêmes
-User.objects.filter(username__startswith="user_").delete()
-
-def create_user(index, est_conducteur=False):
-    username = f"user_{index}"
-    email = f"user{index}@exemple.com"
-    password = "motdepasse123"
-
-    user, created = User.objects.get_or_create(username=username, defaults={
-        "email": email,
-        "password": password  # Note : get_or_create ne hash pas le mot de passe, cf. remarque ci-dessous
-    })
-
-    if created:
-        ProfilUtilisateur.objects.create(utilisateur=user, est_conducteur=est_conducteur)
-    else:
-        if not hasattr(user, 'profilutilisateur'):
-            ProfilUtilisateur.objects.create(utilisateur=user, est_conducteur=est_conducteur)
-        else:
-            print(f"⚠️ Profil déjà existant pour {username}")
+def generer_voyages_ecologiques():
+    voyages = Voyage.objects.all()
     
-    return user
+    for voyage in voyages:
+        # Ne pas dupliquer si un voyage écologique similaire existe déjà
+        exists = Voyage.objects.filter(
+            conducteur=voyage.conducteur,
+            depart=voyage.depart,
+            arrivee=voyage.arrivee,
+            date_depart__gt=timezone.now(),
+            ecologique=True
+        ).exists()
+        
+        if not exists:
+            new_date = voyage.date_depart + timezone.timedelta(days=random.randint(7, 30))
+            Voyage.objects.create(
+                conducteur=voyage.conducteur,
+                titre=f"{voyage.titre} (version écologique)",
+                description=voyage.description + " (Ce voyage est écologique)",
+                depart=voyage.depart,
+                arrivee=voyage.arrivee,
+                date_depart=new_date,
+                places_disponibles=voyage.places_disponibles,
+                prix=voyage.prix,
+                ecologique=True,
+                etat='A_VENIR'
+            )
+            print(f"Voyage écologique créé basé sur le voyage {voyage.id}")
+        else:
+            print(f"Voyage écologique similaire déjà existant pour {voyage.id}")
 
-# Création des utilisateurs
-for i in range(1, 6):  # Conducteurs
-    create_user(i, est_conducteur=True)
-
-for i in range(6, 11):  # Utilisateurs simples
-    create_user(i, est_conducteur=False)
-
-for i in range(11, 16):  # Mélange
-    create_user(i, est_conducteur=random.choice([True, False]))
+# Appel de la fonction
+generer_voyages_ecologiques()

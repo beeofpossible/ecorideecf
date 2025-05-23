@@ -32,11 +32,30 @@
                      Voyage écologique seulement
                     </label>
                     </div>
+                    <div class="form-check mb-2">
+    <input class="form-check-input" type="checkbox" name="non_ecologique" id="non_ecologique" {% if request.GET.non_ecologique %}checked{% endif %}>
+    <label class="form-check-label" for="non_ecologique">Voyage non écologique seulement</label>
+</div>
+
+<div class="form-check mb-3">
+    <input class="form-check-input" type="checkbox" name="avec_avis" id="avec_avis" {% if request.GET.avec_avis %}checked{% endif %}>
+    <label class="form-check-label" for="avec_avis">Uniquement les conducteurs avec avis</label>
+</div>
+
                     <div class="mb-3">
                      <label for="rayon" class="form-label">Rayon de recherche (km) : <span id="rayon-val">{{ request.GET.rayon|default:50 }}</span> km</label>
                          <input type="range" class="form-range" min="1" max="200" step="1" id="rayon" name="rayon"
                               value="{{ request.GET.rayon|default:50 }}">
                     </div>
+                    <div class="mb-3">
+    <label class="form-label">Note minimale</label>
+    <div id="star-filter" class="d-flex align-items-center" style="gap: 5px; cursor: pointer;">
+        {% for i in "12345" %}
+            <i class="fa fa-star-o star-icon" data-value="{{ forloop.counter }}" style="font-size: 1.5rem; color: #ccc;"></i>
+        {% endfor %}
+    </div>
+    <input type="hidden" name="note_min" id="note_min" value="{{ request.GET.note_min|default:"0" }}">
+</div>
                     <button type="submit" class="btn btn-outline-success w-100">Rechercher</button>
                 </form>
             </div>
