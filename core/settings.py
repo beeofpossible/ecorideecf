@@ -156,7 +156,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Variables
 GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
-GS_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'firebase-key.json')
+GS_CREDENTIALS_PATH = os.environ.get("GS_CREDENTIALS_PATH")
 
 # Configuration Firebase Storage
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"

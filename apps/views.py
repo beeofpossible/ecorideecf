@@ -840,3 +840,10 @@ def detail_facture(request, facture_id):
     facture = get_object_or_404(Facture, pk=facture_id)
     return render(request, 'apps/admin/facture-single.html', {'facture': facture, 
                                                               'site':site,})
+    
+@staff_member_required
+def marquer_paye(request, facture_id):
+    facture = get_object_or_404(Facture, id=facture_id)
+    facture.est_paye = True
+    facture.save()
+    return redirect('apps:liste_factures')
