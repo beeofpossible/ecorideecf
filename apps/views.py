@@ -27,8 +27,9 @@ from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models.functions import TruncDate
 
+
 def uml(request):
-    return(render, "apps/home/diagramme-uml.html")
+    return render(request, "apps/home/diagramme-uml.html")
 
 def superuser_required(view_func):
     return user_passes_test(lambda u: u.is_superuser)(view_func)
