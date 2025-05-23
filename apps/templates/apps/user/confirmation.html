@@ -1,0 +1,21 @@
+{% extends "apps/layouts/base.html" %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="alert alert-success shadow p-4 rounded text-center">
+        <h2 class="mb-3">Réservation confirmée ! 🎉</h2>
+        <p class="lead">Votre réservation pour le voyage <strong>{{ voyage.titre }}</strong> a bien été prise en compte.</p>
+        <ul class="list-group list-group-flush my-4">
+          <li class="list-group-item"><strong>Départ :</strong> {{ voyage.depart }} le {{ voyage.date_depart|date:"d/m/Y H:i" }}</li>
+          <li class="list-group-item"><strong>Arrivée :</strong> {{ voyage.arrivee }}</li>
+          <li class="list-group-item"><strong>Prix payé :</strong> {{ reservation.montant }} €</li>
+        </ul>
+        <a href="{% url 'apps:liste-voyages' %}" class="btn btn-primary me-2">Retour à la liste des voyages</a>
+        <a href="{% url 'apps:dashboard' %}" class="btn btn-outline-primary">Voir mes réservations</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

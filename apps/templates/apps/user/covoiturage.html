@@ -1,0 +1,56 @@
+{% extends 'apps/layouts/base.html' %}
+{% block content %}
+
+{% for voyage in voyages_conducteur %}
+    <div class="card mb-3 p-3">
+        <h5>{{ voyage.titre }}</h5>
+        <p><strong>Départ :</strong> {{ voyage.depart }} | <strong>Arrivée :</strong> {{ voyage.arrivee }}</p>
+        <p><strong>Date :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}</p>
+        <p><strong>État :</strong> {{ voyage.get_etat_display }}</p>
+
+        {% if voyage.etat == "A_VENIR" %}
+            <a href="{% url 'apps:demarrer_voyage' voyage.id %}" class="btn btn-success">Démarrer</a>
+        {% elif voyage.etat == "EN_COURS" %}
+            <a href="{% url 'apps:terminer_voyage' voyage.id %}" class="btn btn-warning">Arrivée à destination</a>
+        {% else %}
+            <span class="text-success">Voyage terminé</span>
+        {% endif %}
+    </div>
+{% endfor %}
+
+<div class="container my-5">
+    <h2 class="mb-4">Mes voyages</h2>
+
+    <div class="mb-5">
+        <h4>🚗 Voyages créés (en tant que conducteur)</h4>
+        {% if voyages_conducteur %}
+            {% for voyage in voyages_conducteur %}
+                <div class="card mb-3 p-3">
+                    <h5>{{ voyage.titre }}</h5>
+                    <p><strong>Départ :</strong> {{ voyage.depart }} | <strong>Arrivée :</strong> {{ voyage.arrivee }}</p>
+                    <p><strong>Date :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">Vous n’avez créé aucun voyage.</p>
+        {% endif %}
+    </div>
+
+    <div>
+        <h4>🧍‍♂️ Voyages réservés (en tant que passager)</h4>
+        {% if voyages_passager %}
+            {% for voyage in voyages_passager %}
+                <div class="card mb-3 p-3">
+                    <h5>{{ voyage.titre }}</h5>
+                    <p><strong>Départ :</strong> {{ voyage.depart }} | <strong>Arrivée :</strong> {{ voyage.arrivee }}</p>
+                    <p><strong>Date :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Conducteur :</strong> {{ voyage.conducteur.username }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">Vous ne participez à aucun voyage.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

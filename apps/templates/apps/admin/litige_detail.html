@@ -32,49 +32,42 @@
     <!-- CONTENU ADMINISTRATEUR -->
     <div class="col-md-9">
       <div class="card shadow-sm p-4">
-        <h2 class="mb-4"><i class="fas fa-exclamation-triangle"></i> Liste des litiges</h2>
+        <h2 class="mb-4"><i class="fas fa-exclamation-triangle"></i> Détail du litige #{{ litige.id }}</h2>
 
-        <table class="table table-bordered table-striped">
-          <thead class="thead-dark">
-            <tr>
-              <th>Utilisateur</th>
-              <th>Titre</th>
-              <th>Statut</th>
-              <th>Date de création</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+        <table class="table table-bordered" style="background-color: #f9f9f9;">
           <tbody>
-            {% for litige in litiges %}
             <tr>
+              <th style="width: 30%;">Utilisateur</th>
               <td>{{ litige.utilisateur.username }}</td>
-              <td>{{ litige.titre }}</td>
-              <td>{{ litige.get_statut_display }}</td>
-              <td>{{ litige.date_ouverture|date:"d M Y H:i" }}</td>
-              <td>
-                <a href="{% url 'apps:litige_detail' litige.id %}" class="btn btn-sm btn-primary">Voir</a>
-                <a href="{% url 'apps:supprimer_litige' litige.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Confirmer la suppression ?')">Supprimer</a>
-              </td>
             </tr>
-            {% empty %}
             <tr>
-              <td colspan="5" class="text-center">Aucun litige à afficher.</td>
+              <th>Titre</th>
+              <td>{{ litige.titre }}</td>
             </tr>
-            {% endfor %}
+            <tr>
+              <th>Description</th>
+              <td>{{ litige.description|linebreaksbr }}</td>
+            </tr>
+            <tr>
+              <th>Statut</th>
+              <td>{{ litige.get_statut_display }}</td>
+            </tr>
+            <tr>
+              <th>Date de création</th>
+              <td>{{ litige.date_creation|date:"d M Y H:i" }}</td>
+            </tr>
+            <tr>
+              <th>Date de mise à jour</th>
+              <td>{{ litige.date_modification|date:"d M Y H:i" }}</td>
+            </tr>
           </tbody>
         </table>
 
-        <!-- Pagination -->
-        <div class="mt-3 text-center">
-          {% if litiges.has_previous %}
-          <a href="?page={{ litiges.previous_page_number }}" class="btn btn-outline-secondary btn-sm">← Précédent</a>
-          {% endif %}
-          <span class="mx-2">Page {{ litiges.number }} sur {{ litiges.paginator.num_pages }}</span>
-          {% if litiges.has_next %}
-          <a href="?page={{ litiges.next_page_number }}" class="btn btn-outline-secondary btn-sm">Suivant →</a>
-          {% endif %}
-        </div>
-
+        <p class="mt-3">
+          <a href="{% url 'apps:liste_litiges' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la liste des litiges
+          </a>
+        </p>
       </div>
     </div>
 

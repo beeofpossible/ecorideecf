@@ -1,19 +1,43 @@
 {% extends "apps/layouts/base.html" %}
+{% load static %}
+
+
 {% block content %}
-<div class="container mt-5">
-    <h2>Inscription</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-3">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                    <div class="text-danger">{{ field.errors|striptags }}</div>
-                {% endif %}
+<div class="register-container">
+    <div class="register-card">
+        <p class="text-center mb-2">
+            Vous avez déjà un compte ? <a href="{% url 'apps:connexion' %}">Connexion</a>
+        </p>
+
+        <h3 class="text-center mb-4">Créer un compte</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <!-- Champ pour le rôle -->
+            <div class="mb-4">
+                <label for="role" class="form-label">Je suis :</label>
+                <select name="role" id="role" class="form-select" required>
+                    <option value="">-- Sélectionnez un rôle --</option>
+                    <option value="conducteur">Conducteur</option>
+                    <option value="passager">Passager</option>
+                    <option value="les_deux">Les deux</option>
+                </select>
             </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-success">Créer un compte</button>
-    </form>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-success w-100">Créer un compte</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -1,65 +1,92 @@
 {% extends "apps/layouts/base.html" %}
 {% load static %}
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<div class="container-fluid mt-5">
+  <div class="row">
 
-<table style="width: 60%; background-color: #f0f0f0; border-collapse: collapse;">
-    <tbody>
-        <tr style="background-color: #2e7d32; color: white;">
-            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Champ</th>
-            <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Valeur</th>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Type de facture</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.get_type_facture_display }}</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Montant</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.montant }} €</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Date</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.date_facture }}</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Voiture</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">
-                {{ facture.voiture.marque }} {{ facture.voiture.modele }} ({{ facture.voiture.immatriculation }})
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Voyage</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">
+    <!-- MENU ADMINISTRATEUR -->
+    <div class="col-md-3">
+      <div class="card bg-light shadow-sm p-3">
+        <h5 class="mb-3"><i class="fas fa-cogs"></i> Menu admin</h5>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <a href="{% url 'apps:liste_factures' %}"><i class="fas fa-file-invoice"></i> Factures</a>
+          </li>
+          <li class="list-group-item">
+            <a href="{% url 'apps:avis_liste' %}"><i class="fas fa-star"></i> Avis</a>
+          </li>
+          <li class="list-group-item">
+            <a href="{% url 'apps:gestion_pages' %}"><i class="fas fa-file-alt"></i> Pages</a>
+          </li>
+          <li class="list-group-item">
+            <a href="{% url 'apps:gestion_temoignage' %}"><i class="fas fa-comment"></i> Témoignages</a>
+          </li>
+          <li class="list-group-item active">
+            <a href="{% url 'apps:liste_litiges' %}"><i class="fas fa-exclamation-triangle"></i> Litiges</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CONTENU ADMINISTRATEUR -->
+    <div class="col-md-9">
+      <div class="card shadow-sm p-4">
+        <h2 class="mb-4"><i class="fas fa-file-invoice"></i> Détail de la facture #{{ facture.numero }}</h2>
+
+        <table class="table table-bordered" style="background-color: #f9f9f9;">
+          <tbody>
+            <tr>
+              <th style="width: 30%;">Type de facture</th>
+              <td>{{ facture.get_type_facture_display }}</td>
+            </tr>
+            <tr>
+              <th>Montant</th>
+              <td>{{ facture.montant }} €</td>
+            </tr>
+            <tr>
+              <th>Date</th>
+              <td>{{ facture.date_facture|date:"d M Y" }}</td>
+            </tr>
+            <tr>
+              <th>Voiture</th>
+              <td>{{ facture.voiture.marque }} {{ facture.voiture.modele }} ({{ facture.voiture.immatriculation }})</td>
+            </tr>
+            <tr>
+              <th>Voyage</th>
+              <td>
                 {% if facture.voyage %}
-                    {{ facture.voyage.titre }}
+                  {{ facture.voyage.titre }}
                 {% else %}
-                    -
+                  -
                 {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Description</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.description|linebreaksbr }}</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">Document</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">
+              </td>
+            </tr>
+            <tr>
+              <th>Description</th>
+              <td>{{ facture.description|linebreaksbr }}</td>
+            </tr>
+            <tr>
+              <th>Document</th>
+              <td>
                 {% if facture.document %}
-                    <a href="{{ facture.document.url }}" target="_blank">Télécharger</a>
+                  <a href="{{ facture.document.url }}" target="_blank">Télécharger</a>
                 {% else %}
-                    Aucun document
+                  Aucun document
                 {% endif %}
-            </td>
-        </tr>
-    </tbody>
-</table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-<p style="margin-top: 20px;">
-    <a href="{% url 'apps:liste_factures' %}">← Retour à la liste des factures</a>
-</p>
-{% endblock content %}
+        <p class="mt-3">
+          <a href="{% url 'apps:liste_factures' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la liste des factures
+          </a>
+        </p>
+      </div>
+    </div>
 
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+  </div>
+</div>
+{% endblock %}

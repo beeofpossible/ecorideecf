@@ -1,9 +1,18 @@
 {% extends "apps/layouts/base.html" %}
 {% block content %}
-<h2>Laisser un avis</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Envoyer</button>
-</form>
+<div class="container my-5">
+    <h2 class="mb-4">Laisser un avis pour le voyage "{{ voyage.titre }}"</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_note">Note</label>
+            {{ form.note }}
+        </div>
+        <div class="form-group">
+            <label for="id_commentaire">Commentaire (facultatif)</label>
+            {{ form.commentaire }}
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Envoyer</button>
+    </form>
+</div>
 {% endblock %}

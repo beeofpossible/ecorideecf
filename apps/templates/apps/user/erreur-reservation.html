@@ -1,0 +1,17 @@
+{% extends "apps/layouts/base.html" %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="alert alert-danger text-center shadow p-4 rounded">
+        <h2 class="mb-3">Erreur de réservation</h2>
+        <p class="lead">{{ message }}</p>
+        <a href="{% url 'apps:liste-voyages' %}" class="btn btn-primary mt-3">
+          Retour à la liste des voyages
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

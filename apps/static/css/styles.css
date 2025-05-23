@@ -57,6 +57,90 @@
     font-weight: bold;
 }
 
+.login-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+}
+
+.login-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-card h3 {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.login-card form .form-control {
+    border-radius: 5px;
+}
+
+.login-card .btn-success {
+    padding: 10px 0;
+    font-weight: bold;
+}
+
+.login-card small a {
+    text-decoration: none;
+    color: #198754;
+}
+
+.login-card small a:hover {
+    text-decoration: underline;
+}
+.register-container {
+    
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+}
+
+.register-card {
+    margin:30px;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.register-card h3 {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.register-card p a {
+    color: #198754;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.register-card p a:hover {
+    text-decoration: underline;
+}
+
+.register-card .form-select,
+.register-card .form-control {
+    border-radius: 5px;
+}
+
+.register-card .btn-success {
+    padding: 10px 0;
+    font-weight: bold;
+}
+
+
 /* Section cover avec image à gauche et texte à droite */
 .cover-section {
   max-width: 40vw; /* largeur max 40% de la fenêtre */
@@ -140,6 +224,11 @@
     border-radius: 0.5rem;
     position: relative;
 }
+#profil-miniatures {
+  justify-content: center;
+  text-align: center;
+}
+
 .profil-miniature:hover {
   transform: scale(1.02);
 }
@@ -156,6 +245,7 @@
 .profil-miniature {
     cursor: pointer;
     transition: transform 0.2s ease;
+    
 }
 .profil-miniature:hover {
     transform: scale(1.02);
@@ -214,6 +304,10 @@
   line-height: 1.6;
 }
 
+.text-succes{
+  color: #052c19 !important;
+}
+
 .site-info {
     background-color: white;
     color: #000;
@@ -250,7 +344,27 @@
       font-size: 1rem;
   }
 }
+.container-help {
+  width: 80%;
+  max-width: 1000px;
+  position: relative;
+  display: flex;
+}
 
+
+/* Image à gauche */
+.container-help .image-left {
+  flex: 0 0 40%;
+  margin-right: 20px;
+}
+
+/* Texte à droite */
+.container-help .text-right {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
 .card-title {
   font-weight: bold;
@@ -283,6 +397,10 @@
     object-fit: cover;
     border-radius: 50%;
     margin-right: 10px;
+}
+
+.gap-2 {
+  gap: 1rem; 
 }
 
  .form-container {

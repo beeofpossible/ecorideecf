@@ -2,27 +2,36 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Connexion</h2>
-    <form method="post" class="mt-4">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-3">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                    <div class="text-danger">{{ field.errors|striptags }}</div>
-                {% endif %}
-            </div>
-        {% endfor %}
+<div class="login-container">
+    <div class="login-card">
+        <h3 class="text-center mb-4">Connexion</h3>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-danger">{{ message }}</div>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
             {% endfor %}
-        {% endif %}
 
-        <button type="submit" class="btn btn-primary">Se connecter</button>
-    </form>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-success w-100">Se connecter</button>
+            </div>
+
+            <div class="text-center mt-3">
+                <small>Pas encore de compte ? <a href="{% url 'apps:inscription' %}">Créez le vôtre</a></small>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

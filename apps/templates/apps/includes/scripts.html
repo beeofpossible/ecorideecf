@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Supprimer l'état actif
             document.querySelectorAll('.profil-miniature.active').forEach(el => el.classList.remove('active'));
             this.classList.add('active');
-
             // Données
             const titre = this.dataset.titre;
             const sousTitre = this.dataset.sousTitre;
@@ -33,6 +32,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const setupAutocomplete = (inputId, datalistId) => {
+        const input = document.getElementById(inputId);
+        const datalist = document.getElementById(datalistId);
+
+        input.addEventListener("input", function() {
+            const query = input.value;
+            if (query.length < 3) {
+                datalist.innerHTML = "";
+                return;
+            }
+
+            fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&countrycodes=fr&format=json&limit=5`)
+            .then(response => response.json())
+            .then(data => {
+                datalist.innerHTML = "";
+                data.forEach(place => {
+                    const option = document.createElement("option");
+                    option.value = place.display_name;
+                    datalist.appendChild(option);
+                });
+            });
+        });
+    };
+
+    setupAutocomplete("id_depart", "depart_list");
+    setupAutocomplete("id_arrivee", "arrivee_list");
+});
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    toastElList.forEach(function (toastEl) {
+      new bootstrap.Toast(toastEl, { delay: 4000 }).show();
+    });
+  });
+</script>
+
+
+<script>
     document.addEventListener("DOMContentLoaded", function() {
         const setupAutocomplete = (inputId) => {
             const input = document.getElementById(inputId);
@@ -41,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const query = input.value;
                 if (query.length < 3) return;
     
-                fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&format=json&limit=5`)
+                fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&countrycodes=fr&format=json&limit=5`)
                     .then(response => response.json())
                     .then(data => {
                         const datalistId = inputId + "_list";

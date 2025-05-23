@@ -59,7 +59,7 @@
 </div>
 
 <div class="container mt-5">
-    <h2 class="mb-4">Nos utilisateurs</h2>
+    <h2 class="text-center mb-4 fw-bold text-succes">Nos utilisateurs</h2>
 
     <!-- Miniatures -->
     <div class="row g-2" id="profil-miniatures">
@@ -141,7 +141,7 @@
 
     <!-- Texte à droite -->
     <div class="col-md-6 text-container">
-      <h2>Besoin d'un plein ?</h2>
+      <h2 class="mb-4 fw-bold text-succes">Besoin d'un plein ?</h2>
       <h4>Ecoride rembourse vos cents premiers euros dépensés</h4>
       <p>
         Ecoride, soucieux de l'environnement, met en place le chèque éco-malin : sur vos trajets, nous vous remboursons vos cent premiers euros de dépensés ! 
@@ -154,7 +154,7 @@
 
 <!-- Voyages populaires -->
 <div class="container mt-5">
-    <h2 class="mb-4">Trajets les plus populaires</h2>
+    <h2 class="text-center mb-4 fw-bold text-succes">Trajets les plus populaires</h2>
     <div class="row">
         {% for voyage in voyages_populaires %}
             <div class="col-md-4 mb-3">
@@ -176,16 +176,16 @@
 </div>
 
 <div class="container my-5 d-flex justify-content-center">
-  <div class="d-flex" style="width: 80%; max-width: 1000px;">
+  <div class="container-help">
 
     <!-- Image à gauche (40%) -->
-    <div style="flex: 0 0 40%; margin-right: 20px;">
+    <div class="image-left">
       <img src="{% static 'img/aide.jfif' %}" alt="Besoin d'aide ?" class="img-fluid rounded shadow" style="width: 100%; height: auto;">
     </div>
 
     <!-- Texte à droite (40%) -->
-    <div style="flex: 0 0 40%; display: flex; flex-direction: column; justify-content: center;">
-      <h2 class="fw-bold">Besoin d'aide ?</h2>
+    <div class="text-right">
+      <h2 class="mb-4 fw-bold text-succes">Besoin d'aide ?</h2>
       <p class="lead">Ecoride intervient 24h/24 pour vous accompagner.</p>
     </div>
 

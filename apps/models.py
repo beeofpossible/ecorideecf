@@ -1,11 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 
 # Modèle pour l'utilisateur (hérite de User)
 class ProfilUtilisateur(models.Model):
     utilisateur = models.OneToOneField(User, on_delete=models.CASCADE)
-    est_conducteur = models.BooleanField(default=False)  # Permet de savoir si l'utilisateur est conducteur
+    est_conducteur = models.BooleanField(default=False)
+    est_utilisateur = models.BooleanField(default=True) 
     bio = models.TextField(blank=True, null=True)
     photo_profil = models.ImageField(upload_to='photos_profil/', null=True, blank=True)
     photo_profil_url = models.URLField(blank=True, null=True)
@@ -44,14 +46,21 @@ class Site(models.Model):
 
 # Modèle pour un Voyage
 class Voyage(models.Model):
+    ETAT_CHOICES = [
+        ('A_VENIR', 'À venir'),
+        ('EN_COURS', 'En cours'),
+        ('TERMINE', 'Terminé'),
+    ]
     conducteur = models.ForeignKey(User, on_delete=models.CASCADE, related_name='voyages')
     titre = models.CharField(max_length=200)
     description = models.TextField()
-    depart = models.CharField(max_length=100)  # Ville de départ
-    arrivee = models.CharField(max_length=100)  # Ville d'arrivée
+    depart = models.CharField(max_length=100)  
+    arrivee = models.CharField(max_length=100)  
     date_depart = models.DateTimeField()
     places_disponibles = models.PositiveIntegerField()
-    prix = models.DecimalField(max_digits=6, decimal_places=2)  # Prix par passager
+    prix = models.DecimalField(max_digits=6, decimal_places=2) 
+    ecologique = models.BooleanField(default=False)
+    etat = models.CharField(max_length=20, choices=ETAT_CHOICES, default='A_VENIR') 
 
     def __str__(self):
         return f"Voyage de {self.conducteur.username} : {self.depart} -> {self.arrivee}"
@@ -63,6 +72,11 @@ class Voyage(models.Model):
             self.save()
             return True
         return False
+    @property
+    def nb_places_restantes(self):
+        # places initiales moins le nombre de réservations déjà faites
+        reservations_count = self.reservations.count()  # Nombre de réservations liées
+        return self.places_disponibles - reservations_count
 
 # Modèle pour une Réservation
 class Reservation(models.Model):
@@ -74,14 +88,6 @@ class Reservation(models.Model):
     def __str__(self):
         return f"{self.passager.username} a réservé une place sur le voyage de {self.voyage.conducteur.username}."
 
-class Message(models.Model):
-    expediteur = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages_envoyes")
-    destinataire = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages_recus")
-    contenu = models.TextField()
-    date_envoye = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.expediteur.username} → {self.destinataire.username} ({self.date_envoye})"
 class MoyenPaiement(models.Model):
     TYPE_CHOICES = [
         ('CB', 'Carte Bancaire'),
@@ -126,6 +132,17 @@ class Litige(models.Model):
         elif self.type_litige == 'reservation' and self.reservation:
             return self.reservation.voyage.conducteur
         return None
+
+class Message(models.Model):
+    expediteur = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages_envoyes")
+    destinataire = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages_recus")
+    contenu = models.TextField()
+    date_envoye = models.DateTimeField(auto_now_add=True)
+    litige = models.ForeignKey(Litige, related_name='messages', on_delete=models.CASCADE, null=True, blank=True)
+    date_envoi = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return f"{self.expediteur.username} → {self.destinataire.username} ({self.date_envoye})"
 
 class Avi(models.Model):
     voyage = models.ForeignKey('Voyage', on_delete=models.CASCADE, related_name='avis', default=1)
@@ -182,6 +199,7 @@ class Facture(models.Model):
     voyage = models.ForeignKey(Voyage, on_delete=models.SET_NULL, null=True, blank=True, related_name='factures')
     type_facture = models.CharField(max_length=20, choices=FACTURE_TYPE_CHOICES)
     description = models.TextField(blank=True)
+    est_paye = models.BooleanField(default=False)
     montant = models.DecimalField(max_digits=8, decimal_places=2)
     date_facture = models.DateField(auto_now_add=True)
     document = models.FileField(upload_to='factures/', blank=True, null=True)

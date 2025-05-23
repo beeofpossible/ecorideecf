@@ -35,7 +35,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True    
 
-ALLOWED_HOSTS = ["ecorideecf-production.up.railway.app", "127.0.0.1:8000/"]
+ALLOWED_HOSTS = ["ecorideecf-production.up.railway.app", "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ['https://127.0.0.1:8000/',
                         'http://127.0.0.1:8000/', "https://ecorideecf-production.up.railway.app"]
 
@@ -81,6 +81,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 TEMPLATE_DIR = os.path.join(CORE_DIR, "apps/templates")
+LOGIN_URL = '/connexion/'
 
 TEMPLATES = [
     {

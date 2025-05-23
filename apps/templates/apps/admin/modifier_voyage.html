@@ -1,0 +1,22 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Modifier le voyage : {{ voyage.titre }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+        <a href="{% url 'apps:detail_voyage_admin' voyage.id %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

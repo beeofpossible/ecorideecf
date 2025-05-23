@@ -3,6 +3,8 @@ from .models import ProfilUtilisateur, Site, Voyage, Reservation, Message, Moyen
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from .models import Page, PresentationUtilisateur, Temoignage, Facture
+from django.contrib.auth.forms import PasswordChangeForm
+
 
 class ConnexionForm(forms.Form):
     username = forms.CharField(
@@ -60,7 +62,20 @@ class ProfilUtilisateurForm(forms.ModelForm):
         super(ProfilUtilisateurForm, self).__init__(*args, **kwargs)
         # Optionnel : Personnaliser les widgets pour améliorer l'UI
         self.fields['bio'].widget = forms.Textarea(attrs={'rows': 4, 'cols': 40})
-        
+
+class RoleForm(forms.ModelForm):
+    class Meta:
+        model = ProfilUtilisateur
+        fields = ['est_conducteur', 'est_utilisateur']
+        widgets = {
+            'est_conducteur': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'est_utilisateur': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'est_conducteur': "Je suis conducteur",
+            'est_utilisateur': "Je suis utilisateur",
+        }
+
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
@@ -86,11 +101,22 @@ class SiteForm(forms.ModelForm):
         self.fields['icone_avantage_3'].widget = forms.TextInput(attrs={'placeholder': 'Ex: fa-solid fa-lock'})
         
 class VoyageForm(forms.ModelForm):
+    date_depart = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        input_formats=['%Y-%m-%dT%H:%M']
+    )
+
     class Meta:
         model = Voyage
         fields = ['titre', 'description', 'depart', 'arrivee', 'date_depart', 'places_disponibles', 'prix']
         exclude = ['conducteur']
-        
+
+        widgets = {
+            'depart': forms.TextInput(attrs={'list': 'depart_list', 'autocomplete': 'off'}),
+            'arrivee': forms.TextInput(attrs={'list': 'arrivee_list', 'autocomplete': 'off'}),
+            # le widget date_depart est défini séparément
+        }
+
     def __init__(self, *args, **kwargs):
         super(VoyageForm, self).__init__(*args, **kwargs)
         # Personnaliser les widgets pour améliorer l'UI

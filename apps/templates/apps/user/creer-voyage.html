@@ -38,6 +38,7 @@
             </div>
         </div>
 
+        
         <!-- Formulaire principal (70%) -->
         <div class="col-md-9">
             <div class="card shadow-sm p-4">
@@ -59,12 +60,19 @@
                         </div>
                     {% endfor %}
 
+                    <!-- Datalists pour autocomplétion -->
+                    <datalist id="depart_list"></datalist>
+                    <datalist id="arrivee_list"></datalist>
+
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-check"></i> Créer le voyage
                     </button>
                 </form>
             </div>
         </div>
+
+    </div>
+</div>
 
     </div>
 </div>

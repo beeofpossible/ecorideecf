@@ -1,61 +1,94 @@
 {% extends "apps/layouts/base.html" %}
 {% load static %}
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
 
-<h1>Liste des Factures</h1>
+        <!-- MENU ADMINISTRATEUR -->
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm p-3">
+                <h5 class="mb-3"><i class="fas fa-cogs"></i> Menu admin</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:liste_factures' %}"><i class="fas fa-file-invoice"></i> Factures</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:avis_liste' %}"><i class="fas fa-star"></i> Avis</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:gestion_pages' %}"><i class="fas fa-file-alt"></i> Pages</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:gestion_temoignage' %}"><i class="fas fa-comment"></i> Témoignages</a>
+                    </li>
+                    <li class="list-group-item active">
+                        <a href="{% url 'apps:liste_litiges' %}"><i class="fas fa-exclamation-triangle"></i> Litiges</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-<table style="width:100%; background-color:#f0f0f0; border-collapse: collapse;">
-    <thead style="background-color: #2e7d32; color: white;">
-        <tr>
-            <th style="padding: 8px; border: 1px solid #ddd;">Type</th>
-            <th style="padding: 8px; border: 1px solid #ddd;">Montant (€)</th>
-            <th style="padding: 8px; border: 1px solid #ddd;">Date</th>
-            <th style="padding: 8px; border: 1px solid #ddd;">Voyage</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for facture in factures %}
-        <tr>
-            <td style="padding: 8px; border: 1px solid #ddd;">
-                <a href="{% url 'apps:detail_facture' facture.id %}" style="color: #2e7d32; text-decoration: none;">
-                    {{ facture.get_type_facture_display }}
-                </a>
-            </td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.montant }}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ facture.date_facture }}</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">
-                {% if facture.voyage %}
-                    {{ facture.voyage.titre }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4" style="padding: 8px; border: 1px solid #ddd; text-align: center;">Aucune facture disponible.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <!-- CONTENU ADMINISTRATEUR -->
+        <div class="col-md-9">
+            <div class="card shadow-sm p-4">
+                <h2 class="mb-4"><i class="fas fa-file-invoice"></i> Liste des Factures</h2>
 
-<!-- Pagination -->
-<div style="margin-top: 20px; text-align: center;">
-    {% if factures.has_previous %}
-        <a href="?page={{ factures.previous_page_number }}" style="margin-right: 10px;">← Précédent</a>
-    {% endif %}
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Utilisateur</th>
+                            <th>Date</th>
+                            <th>Montant (€)</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for facture in factures %}
+                        <tr>
+                            <td>{{ facture.numero }}</td>
+                            <td>{{ facture.utilisateur.username }}</td>
+                            <td>{{ facture.date_emission|date:"d M Y" }}</td>
+                            <td>{{ facture.montant|floatformat:2 }}</td>
+                            <td>
+                                {% if facture.est_paye %}
+                                    <span class="badge bg-success">Payée</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'apps:detail_facture' facture.id %}" class="btn btn-sm btn-info">Voir</a>
+                                {% if not facture.est_paye %}
+                                    <a href="{% url 'apps:marquer_paye' facture.id %}" class="btn btn-sm btn-success">Marquer payée</a>
+                                {% endif %}
+                                <a href="{% url 'apps:supprimer_facture' facture.id %}" class="btn btn-sm btn-danger">Supprimer</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune facture à afficher.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
-    <span>Page {{ factures.number }} sur {{ factures.paginator.num_pages }}</span>
+                <!-- Pagination -->
+                <div class="mt-3 text-center">
+                    {% if factures.has_previous %}
+                        <a href="?page={{ factures.previous_page_number }}" class="btn btn-outline-secondary btn-sm">← Précédent</a>
+                    {% endif %}
+                    <span class="mx-2">Page {{ factures.number }} sur {{ factures.paginator.num_pages }}</span>
+                    {% if factures.has_next %}
+                        <a href="?page={{ factures.next_page_number }}" class="btn btn-outline-secondary btn-sm">Suivant →</a>
+                    {% endif %}
+                </div>
 
-    {% if factures.has_next %}
-        <a href="?page={{ factures.next_page_number }}" style="margin-left: 10px;">Suivant →</a>
-    {% endif %}
+            </div>
+        </div>
+
+    </div>
 </div>
-
-{% endblock content %}
-
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% endblock %}

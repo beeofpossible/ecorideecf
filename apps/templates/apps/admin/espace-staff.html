@@ -1,0 +1,85 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+
+        <!-- MENU ADMINISTRATEUR -->
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm p-3">
+                <h5 class="mb-3"><i class="fas fa-cogs"></i> Menu admin</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:liste_factures' %}"><i class="fas fa-file-invoice"></i> Factures</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:avis_liste' %}"><i class="fas fa-star"></i> Avis</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:gestion_pages' %}"><i class="fas fa-file-alt"></i> Pages</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:gestion_temoignage' %}"><i class="fas fa-comment"></i> Témoignages</a>
+                    </li>
+                    <li class="list-group-item active">
+                     <a href="{% url 'apps:liste_litiges' %}"><i class="fas fa-exclamation-triangle"></i> Litiges</a>
+                        </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CONTENU ADMINISTRATEUR -->
+        <div class="col-md-9">
+            <div class="card shadow-sm p-4">
+                <h2 class="mb-4"><i class="fas fa-star"></i> Liste des Avis Utilisateurs</h2>
+
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Auteur</th>
+                            <th>Note</th>
+                            <th>Commentaire</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in avis %}
+                        <tr>
+                            <td>{{ a.utilisateur.username }}</td>
+                            <td>{{ a.note }}/5</td>
+                            <td>{{ a.contenu|truncatechars:60 }}</td>
+                            <td>{{ a.date_creation|date:"d M Y H:i" }}</td>
+                            <td>
+                                {% if not a.est_affiche %}
+                                    <a href="{% url 'apps:valider_avis' a.id %}" class="btn btn-sm btn-success">Approuver</a>
+                                {% endif %}
+                                <a href="{% url 'apps:supprimer_avis' a.id %}" class="btn btn-sm btn-danger">Supprimer</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun avis à afficher.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="mt-3 text-center">
+                    {% if avis.has_previous %}
+                        <a href="?page={{ avis.previous_page_number }}" class="btn btn-outline-secondary btn-sm">← Précédent</a>
+                    {% endif %}
+                    <span class="mx-2">Page {{ avis.number }} sur {{ avis.paginator.num_pages }}</span>
+                    {% if avis.has_next %}
+                        <a href="?page={{ avis.next_page_number }}" class="btn btn-outline-secondary btn-sm">Suivant →</a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

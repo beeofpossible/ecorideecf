@@ -1,37 +1,57 @@
 {% extends "apps/layouts/base.html" %}
 {% load static %}
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<div class="container py-5">
+  <h1 class="mb-4 text-center">Contactez-nous</h1>
 
-<div class="container contact-form">
-  <h1>Contactez-nous</h1>
-  <form method="post" action="">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="id_nom" class="form-label">Nom</label>
-      <input type="text" class="form-control" id="id_nom" name="nom" required>
-    </div>
-    <div class="mb-3">
-      <label for="id_email" class="form-label">Email</label>
-      <input type="email" class="form-control" id="id_email" name="email" required>
-    </div>
-    <div class="mb-3">
-      <label for="id_message" class="form-label">Message</label>
-      <textarea class="form-control" id="id_message" name="message" rows="5" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-success">Envoyer</button>
-  </form>
+  <div class="row">
+    <!-- Formulaire -->
+    <div class="col-md-6 mb-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="id_nom" name="nom" placeholder="Votre nom" required>
+          <label for="id_nom">Nom</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="id_email" name="email" placeholder="email@example.com" required>
+          <label for="id_email">Email</label>
+        </div>
+        <div class="form-floating mb-3">
+          <textarea class="form-control" id="id_message" name="message" placeholder="Votre message" style="height: 150px;" required></textarea>
+          <label for="id_message">Message</label>
+        </div>
+        <button type="submit" class="btn btn-success">Envoyer</button>
 
-  {% if success %}
-    <div class="alert alert-success mt-3">
-      Merci pour votre message, nous vous répondrons rapidement !
+        {% if success %}
+          <div class="alert alert-success mt-4">
+            Merci pour votre message, nous vous répondrons rapidement !
+          </div>
+        {% endif %}
+      </form>
     </div>
-  {% endif %}
+
+    <!-- Infos + carte -->
+    <div class="col-md-6">
+      <h5 class="mb-3">Notre adresse</h5>
+      <p>
+        42 Rue de l'Innovation<br>
+        75000 Paris<br>
+        France
+      </p>
+      <p><strong>Téléphone :</strong> 01 23 45 67 89</p>
+      <p><strong>Email :</strong> contact@ecoride.fr</p>
+      <p><strong>Horaires :</strong><br>
+        Lundi à Vendredi : 9h – 18h</p>
+
+      <div class="ratio ratio-4x3 rounded shadow-sm">
+        <iframe
+          src="https://www.openstreetmap.org/export/embed.html?bbox=2.3488%2C48.853%2C2.3498%2C48.854&layer=mapnik&marker=48.8535%2C2.3493"
+          style="border: 0;" allowfullscreen loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </div>
 </div>
-
-{% endblock content %}
-
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% endblock %}

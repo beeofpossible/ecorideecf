@@ -1,0 +1,38 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Liste des covoiturages</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Conducteur</th>
+                <th>Départ</th>
+                <th>Arrivée</th>
+                <th>Date départ</th>
+                <th>Places disponibles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for voyage in voyages %}
+            <tr>
+                <td>{{ voyage.titre }}</td>
+                <td>{{ voyage.conducteur.username }}</td>
+                <td>{{ voyage.depart }}</td>
+                <td>{{ voyage.arrivee }}</td>
+                <td>{{ voyage.date_depart|date:"d/m/Y H:i" }}</td>
+                <td>{{ voyage.places_disponibles }}</td>
+                <td>
+                    <a href="{% url 'apps:detail_voyage_admin' voyage.id %}" class="btn btn-sm btn-primary">Voir détail</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center">Aucun covoiturage trouvé.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

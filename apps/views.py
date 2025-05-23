@@ -2,9 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Voyage, Reservation, Site, Page, PresentationUtilisateur, Temoignage
 from .models import ProfilUtilisateur, Message, Litige, Avi, Voiture, Facture, Credit, MoyenPaiement
 from .forms import VoyageForm, ConnexionForm, InscriptionForm,MessageForm,MoyenPaiementForm, LitigeForm
-from .forms import MessageLitigeForm
+from .forms import MessageLitigeForm, RoleForm
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from .signals import credit_achete 
 from django.contrib.auth import login, logout
 from django.utils import timezone
@@ -191,7 +192,7 @@ def index(request):
             total=Count('id'),
             prochain_voyage=Min('date_depart')
         )
-        .order_by('-total')[:5]
+        .order_by('-total')[:3]
     )
 
     # Enrichissement avec les détails du prochain voyage
@@ -248,7 +249,39 @@ def dashboard_view(request):
 @staff_member_required
 def espace_staff(request):
     site = Site.objects.first()
-    return render(request, "apps/home/espace-staff.html", {'site':site} )
+    return render(request, "apps/admin/espace-staff.html", {'site':site} )
+
+@staff_member_required
+def detail_voyage_admin(request, voyage_id):
+    voyage = get_object_or_404(Voyage, id=voyage_id)
+    return render(request, 'apps/admin/covoiturage_detail.html', {'voyage': voyage})
+
+@staff_member_required
+def liste_voyages_admin(request):
+    voyages = Voyage.objects.all().order_by('-date_depart')
+    return render(request, 'apps/admin/covoiturages-list.html', {'voyages': voyages})
+
+@staff_member_required
+def modifier_voyage_admin(request, voyage_id):
+    voyage = get_object_or_404(Voyage, id=voyage_id)
+    if request.method == 'POST':
+        form = VoyageForm(request.POST, instance=voyage)
+        if form.is_valid():
+            form.save()
+            return redirect('apps:detail_voyage_admin', voyage_id=voyage.id)
+    else:
+        form = VoyageForm(instance=voyage)
+
+    return render(request, 'apps/admin/modifier_voyage.html', {'form': form, 'voyage': voyage})
+
+@staff_member_required
+def supprimer_voyage_admin(request, voyage_id):
+    voyage = get_object_or_404(Voyage, id=voyage_id)
+    if request.method == 'POST':
+        voyage.delete()
+        return redirect('apps:liste_voyages_admin')
+    return render(request, 'apps/admin/confirmer_suppression_voyage.html', {'voyage': voyage})
+
 
 def contact(request):
     site = Site.objects.first()
@@ -335,31 +368,80 @@ def liste_voyages(request):
 def reserver_voyage(request, voyage_id):
     site = Site.objects.first()
     voyage = get_object_or_404(Voyage, id=voyage_id)
+    if not request.user.is_authenticated:
+        messages.warning(request, "Vous devez vous connecter pour voir le détail des covoiturages.")
+        return redirect('apps:connexion')
     
     if request.method == 'POST':
         if request.user.is_authenticated:
             if voyage.reserver_place():
                 reservation = Reservation(voyage=voyage, passager=request.user, montant=voyage.prix)
                 reservation.save()
-                return render(request, 'confirmation_reservation.html', {'voyage': voyage})
+                return render(request, 'apps/user/confirmation_reservation.html', {'voyage': voyage})
             else:
-                return render(request, 'erreur_reservation.html', {'message': "Aucune place disponible"})
+                return render(request, 'apps/user/erreur_reservation.html', {'message': "Aucune place disponible"})
         else:
             return redirect('apps:connexion')
     
     return render(request, 'apps/home/reserver-voyage.html', {'voyage': voyage, 'site': site,})
+@login_required
+def mes_voyages(request):
+    utilisateur = request.user
+    voyages_conducteur = Voyage.objects.filter(conducteur=utilisateur)
+    voyages_passager = Voyage.objects.filter(reservations__passager=utilisateur).distinct()
+
+    return render(request, 'apps/user/covoiturage.html', {
+        'voyages_conducteur': voyages_conducteur,
+        'voyages_passager': voyages_passager,
+    })
+
+@login_required
+def demarrer_voyage(request, voyage_id):
+    voyage = get_object_or_404(Voyage, id=voyage_id, conducteur=request.user)
+    if voyage.etat == 'A_VENIR':
+        voyage.etat = 'EN_COURS'
+        voyage.save()
+        messages.success(request, "Voyage démarré.")
+    return redirect('apps:mes_voyages')
+
+def send_mail_avis(passager, voyage):
+    send_mail(
+        subject="Merci de valider votre covoiturage",
+        message=f"Bonjour {passager.username}, veuillez valider votre trajet {voyage.titre}.",
+        from_email="noreply@tonsite.com",
+        recipient_list=[passager.email],
+    )
+
+@login_required
+def terminer_voyage(request, voyage_id):
+    voyage = get_object_or_404(Voyage, id=voyage_id, conducteur=request.user)
+    if voyage.etat == 'EN_COURS':
+        voyage.etat = 'TERMINE'
+        voyage.save()
+        # envoyer mail aux passagers
+        for reservation in voyage.reservations.all():
+            send_mail_avis(reservation.passager, voyage)
+        messages.success(request, "Voyage terminé. Les passagers vont être notifiés.")
+    return redirect('apps:mes_voyages')
 
 @login_required
 def creer_voyage(request):
+    profil = request.user.profilutilisateur
+    if not profil.est_conducteur:
+        messages.error(request, "Vous devez être conducteur pour créer un voyage.")
+        return redirect('apps:settings')
     site = Site.objects.first()
+    if not request.user.is_authenticated:
+        messages.warning(request, "Vous devez vous connecter pour créer un voyage.")
+        return redirect('apps:connexion')
 
     if request.method == 'POST':
         form = VoyageForm(request.POST)
         if form.is_valid():
             voyage = form.save(commit=False)
-            voyage.conducteur = request.user  # L'utilisateur connecté devient le conducteur
+            voyage.conducteur = request.user 
             voyage.save()
-            return redirect('apps:liste_voyages')
+            return redirect('apps:mes_voyages')
     else:
         form = VoyageForm()
 
@@ -408,6 +490,26 @@ def acheter_credits(request):
         'moyens_paiement': moyens,
     })
 
+@staff_member_required
+def litige_detail(request, litige_id):
+    litige = get_object_or_404(Litige, id=litige_id)
+    return render(request, 'apps/admin/litige_detail.html', {'litige': litige})
+
+@staff_member_required
+def liste_litiges(request):
+    litiges_list = Litige.objects.all().order_by('-date_ouverture')
+    paginator = Paginator(litiges_list, 10)  # 10 litiges par page
+    page_number = request.GET.get('page')
+    litiges = paginator.get_page(page_number)
+
+    return render(request, 'apps/admin/litiges.html', {'litiges': litiges})
+
+@staff_member_required
+def supprimer_litige(request, litige_id):
+    litige = get_object_or_404(Litige, id=litige_id)
+    litige.delete()
+    return redirect('apps:liste_litiges')
+
 @login_required
 def signaler_litige(request):
     site = Site.objects.first()
@@ -417,7 +519,7 @@ def signaler_litige(request):
             litige = form.save(commit=False)
             litige.utilisateur = request.user
             litige.save()
-            return redirect('apps:messagerie', litige.id)
+            return redirect('apps:voir_litige', litige_id=litige.id)
     else:
         form = LitigeForm(user=request.user)
 
@@ -467,8 +569,8 @@ def reserver_voyage(request, voyage_id):
     voyage = get_object_or_404(Voyage, id=voyage_id)
 
     # Vérifier qu'il reste de la place
-    if voyage.nb_places_restantes() <= 0:
-        return render(request, 'apps/home/erreur_reservation.html', {
+    if voyage.nb_places_restantes <= 0:
+        return render(request, 'apps/user/erreur-reservation.html', {
             'message': "Aucune place disponible.",
             'site': site
         })
@@ -476,7 +578,7 @@ def reserver_voyage(request, voyage_id):
     # Vérifier que l'utilisateur a assez de crédits
     credit, _ = Credit.objects.get_or_create(utilisateur=request.user)
     if credit.montant < 2:
-        return render(request, 'apps/home/erreur-reservation.html', {
+        return render(request, 'apps/user/erreur-reservation.html', {
             'message': "Vous n'avez pas assez de crédits pour réserver ce voyage.",
             'site': site
         })
@@ -492,23 +594,48 @@ def reserver_voyage(request, voyage_id):
             )
             # Décrémenter les crédits
             credit.retirer(2)
-            return render(request, 'apps/home/confirmation.html', {
+            return render(request, 'apps/user/confirmation.html', {
                 'voyage': voyage,
                 'reservation': reservation,
                 'site': site
             })
         else:
-            return render(request, 'apps/home/erreur-reservation.html', {
+            return render(request, 'apps/user/erreur-reservation.html', {
                 'message': "La réservation a échoué, aucune place disponible.",
                 'site': site
             })
-
     # Première visite => demande de confirmation
-    return render(request, 'apps/home/confirmation-reservation.html', {
+    return render(request, 'apps/user/confirmation-reservation.html', {
         'voyage': voyage,
         'credit_disponible': credit.montant,
         'site': site
     })
+            
+@login_required
+def settings_view(request):
+    profil = request.user.profilutilisateur
+    if request.method == 'POST':
+        role_form = RoleForm(request.POST, instance=profil)
+        password_form = PasswordChangeForm(user=request.user, data=request.POST)
+
+        if 'update_roles' in request.POST and role_form.is_valid():
+            role_form.save()
+            return redirect('apps:settings')
+
+        elif 'update_password' in request.POST and password_form.is_valid():
+            user = password_form.save()
+            update_session_auth_hash(request, user)  # Pour rester connecté après changement
+            return redirect('apps:settings')
+    else:
+        role_form = RoleForm(instance=profil)
+        password_form = PasswordChangeForm(user=request.user)
+
+    return render(request, 'apps/user/settings.html', {
+        'role_form': role_form,
+        'password_form': password_form,
+    })
+
+    
 
 @staff_member_required
 def avis_liste(request):
