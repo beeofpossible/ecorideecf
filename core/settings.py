@@ -165,7 +165,7 @@ MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Charger les credentials
-cred = credentials.Certificate(GS_CREDENTIAL_PATH)
+cred = credentials.Certificate(GS_CREDENTIALS_PATH)
 
 # Initialiser Firebase
 firebase_admin.initialize_app(cred)
