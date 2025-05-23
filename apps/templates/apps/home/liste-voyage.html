@@ -16,15 +16,26 @@
                 <form method="get">
                     <div class="mb-3">
                         <label class="form-label">Ville de départ</label>
-                        <input type="text" name="depart" class="form-control">
+                        <input type="text" name="depart" id="id_depart" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ville d’arrivée</label>
-                        <input type="text" name="arrivee" class="form-control">
+                        <input type="text" name="arrivee" id="id_arrivee" class="form-control" >
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date</label>
                         <input type="date" name="date" class="form-control">
+                    </div>
+                    <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="ecologique" id="ecologique" {% if request.GET.ecologique %}checked{% endif %}>
+                    <label class="form-check-label" for="ecologique">
+                     Voyage écologique seulement
+                    </label>
+                    </div>
+                    <div class="mb-3">
+                     <label for="rayon" class="form-label">Rayon de recherche (km) : <span id="rayon-val">{{ request.GET.rayon|default:50 }}</span> km</label>
+                         <input type="range" class="form-range" min="1" max="200" step="1" id="rayon" name="rayon"
+                              value="{{ request.GET.rayon|default:50 }}">
                     </div>
                     <button type="submit" class="btn btn-outline-success w-100">Rechercher</button>
                 </form>
@@ -38,7 +49,13 @@
         <div class="col-12 mb-4">
             <a href="{% url 'apps:voyages-single' voyage.id %}" class="text-decoration-none text-dark">
                 <div class="card shadow-lg p-4 hover-shadow h-100 d-flex flex-column justify-content-between">
-                    <!-- Contenu principal en haut -->
+                    {% if voyage.ecologique %}
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-success">
+                                <i class="fas fa-leaf"></i> Écologique
+                            </span>
+                        </div>
+                    {% endif %}
                     <div>
                         <h5 class="card-title"><i class="fas fa-route"></i> {{ voyage.titre }}</h5>
                         <p class="card-text mb-2">
@@ -61,8 +78,26 @@
                                 {% else %}
                                     <img src="{% static 'img/autoroute.png' %}" alt="Photo par défaut" class="profil-mini-card me-2">
                                 {% endif %}
-                                <strong>{{ voyage.conducteur.username }}</strong>
-                            </div>
+                                    <div>
+        <strong>{{ voyage.conducteur.username }}</strong><br>
+        {% if voyage.moyenne_avis %}
+            {% with moyenne=voyage.moyenne_avis|floatformat:0 %}
+                {% for i in "12345" %}
+                    {% if forloop.counter <= moyenne %}
+                        <i class="fas fa-star text-warning"></i>
+                    {% else %}
+                        <i class="far fa-star text-warning"></i>
+                    {% endif %}
+                {% endfor %}
+            {% endwith %}
+            <small class="text-muted ms-1">({{ voyage.avis.count }})</small>
+        {% else %}
+            <small class="text-muted">Aucun avis</small>
+        {% endif %}
+    </div>
+</div>
+
+                    
                             <span><i class="fas fa-chair"></i> <strong>Places :</strong> {{ voyage.places_disponibles }}</span>
                             <span><i class="fas fa-euro-sign"></i> <strong>Prix :</strong> {{ voyage.prix }} €</span>
                         </div>

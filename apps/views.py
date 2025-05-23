@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login,update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from .signals import credit_achete 
+from django.db.models import Avg
 from django.contrib.auth import login, logout
 from django.utils import timezone
 from django.db.models import Count, Sum, Min
@@ -15,6 +16,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .forms import AvisForm, VoitureForm, PageForm, PresentationUtilisateurForm, TemoignageForm
 from django.http import JsonResponse, HttpResponseForbidden
 import requests
+from geopy.distance import geodesic
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.utils.timezone import now, timedelta
@@ -354,16 +356,65 @@ def messagerie_view(request, litige_id=None):
             'messages_recus': messages_recus,
             'messages_envoyes': messages_envoyes,
         })
+        
+def geocode_city(city_name):
+    """Retourne (lat, lon) pour une ville via l'API de Nominatim."""
+    url = 'https://nominatim.openstreetmap.org/search'
+    params = {
+        'q': city_name,
+        'format': 'json',
+        'limit': 1
+    }
+    response = requests.get(url, params=params, headers={'User-Agent': 'voyage-app'})
+    results = response.json()
+    if results:
+        return float(results[0]['lat']), float(results[0]['lon'])
+    return None
+        
 
 def liste_voyages(request):
     site = Site.objects.first()
-    voyages_list = Voyage.objects.all().order_by('-date_depart')
-    paginator = Paginator(voyages_list, 6)  
+    voyages_qs = Voyage.objects.annotate(moyenne_avis=Avg('avis__note')).order_by('-date_depart')
 
+    depart = request.GET.get('depart')
+    arrivee = request.GET.get('arrivee')
+    date = request.GET.get('date')
+    ecologique = request.GET.get('ecologique')
+    rayon = request.GET.get('rayon')
+
+    if ecologique == 'on':
+        voyages_qs = voyages_qs.filter(ecologique=True)
+    
+    if date:
+        voyages_qs = voyages_qs.filter(date_depart__date=date)
+
+    if depart and rayon:
+        rayon_km = float(rayon)
+        coords_depart = geocode_city(depart)
+        if coords_depart:
+            voyages_proches_ids = []
+            for voyage in voyages_qs:
+                coords_voyage = geocode_city(voyage.depart)
+                if coords_voyage:
+                    try:
+                        distance = geodesic(coords_depart, coords_voyage).km
+                        if distance <= rayon_km:
+                            voyages_proches_ids.append(voyage.id)
+                    except:
+                        pass
+            voyages_qs = voyages_qs.filter(id__in=voyages_proches_ids)
+
+    if arrivee:
+        voyages_qs = voyages_qs.filter(arrivee__icontains=arrivee)
+
+    paginator = Paginator(voyages_qs, 6)
     page_number = request.GET.get('page')
     voyages = paginator.get_page(page_number)
 
-    return render(request, 'apps/home/liste-voyage.html', {'voyages': voyages, 'site':site,})
+    return render(request, 'apps/home/liste-voyage.html', {
+        'voyages': voyages,
+        'site': site
+    })
 
 def reserver_voyage(request, voyage_id):
     site = Site.objects.first()
@@ -382,7 +433,6 @@ def reserver_voyage(request, voyage_id):
                 return render(request, 'apps/user/erreur_reservation.html', {'message': "Aucune place disponible"})
         else:
             return redirect('apps:connexion')
-    
     return render(request, 'apps/home/reserver-voyage.html', {'voyage': voyage, 'site': site,})
 @login_required
 def mes_voyages(request):
@@ -846,4 +896,10 @@ def marquer_paye(request, facture_id):
     facture = get_object_or_404(Facture, id=facture_id)
     facture.est_paye = True
     facture.save()
+    return redirect('apps:liste_factures')
+
+@staff_member_required
+def supprimer_facture(request, facture_id):
+    facture = get_object_or_404(Facture, id=facture_id)
+    facture.delete()
     return redirect('apps:liste_factures')

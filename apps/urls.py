@@ -51,5 +51,7 @@ urlpatterns = [
     path('staff/factures/', views.liste_factures, name='liste_factures'),
     path('staff/factures/<int:facture_id>/', views.detail_facture, name='detail_facture'),
     path('facture/<int:facture_id>/marquer-payee/', views.marquer_paye, name='marquer_paye'),
+    path('factures/supprimer/<int:facture_id>/', views.supprimer_facture, name='supprimer_facture'),
+
     path('presentation-utilisateur/<int:pk>/json/', views.presentation_utilisateur_json, name='presentation_utilisateur_json'),
 ]

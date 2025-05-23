@@ -183,14 +183,6 @@ if GS_CREDENTIALS_PATH:
 else:
     GS_CREDENTIALS = None
 
-# Charger les credentials
-
-
-# Initialiser Firebase
-
-# Connexion à Firestore
-
-
 GS_DEFAULT_ACL = None  
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 

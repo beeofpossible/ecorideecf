@@ -61,7 +61,36 @@ document.addEventListener("DOMContentLoaded", function() {
     setupAutocomplete("id_arrivee", "arrivee_list");
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function setupAutocomplete(inputId) {
+        const input = document.querySelector(`#${inputId}`);
+        input.addEventListener('input', async function () {
+            if (input.value.length < 3) return;
 
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&countrycodes=fr&format=json&limit=5`);
+            const data = await response.json();
+
+            let datalist = document.getElementById(inputId + '_list');
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = inputId + '_list';
+                input.setAttribute('list', datalist.id);
+                document.body.appendChild(datalist);
+            }
+            datalist.innerHTML = '';
+            data.forEach(place => {
+                const option = document.createElement('option');
+                option.value = place.display_name;
+                datalist.appendChild(option);
+            });
+        });
+    }
+
+    setupAutocomplete('id_depart');
+    setupAutocomplete('id_arrivee');
+});
+</script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
@@ -71,6 +100,15 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const slider = document.getElementById("rayon");
+    const output = document.getElementById("rayon-val");
+    slider.addEventListener('input', function () {
+        output.innerText = slider.value;
+    });
+});
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
