@@ -164,14 +164,6 @@ DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Charger les credentials
-cred = credentials.Certificate(GS_CREDENTIALS_PATH)
-
-# Initialiser Firebase
-firebase_admin.initialize_app(cred)
-
-# Connexion à Firestore
-db = firestore.client()
 
 if GS_CREDENTIALS_PATH:
     try:
@@ -180,13 +172,24 @@ if GS_CREDENTIALS_PATH:
             credentials_info = json.load(file)  # Charge en dictionnaire
 
         GS_CREDENTIALS = service_account.Credentials.from_service_account_info(credentials_info)
-
+        cred = credentials.Certificate(GS_CREDENTIALS)
+        firebase_admin.initialize_app(cred)
+        db = firestore.client()
+             
     except FileNotFoundError:
         raise ValueError("Le chemin de la variable d'environnement GS_CREDENTIALS_PATH est invalide.")
     except json.JSONDecodeError:
         raise ValueError("Le fichier GS_CREDENTIALS_PATH n'est pas un JSON valide.")
 else:
     GS_CREDENTIALS = None
+
+# Charger les credentials
+
+
+# Initialiser Firebase
+
+# Connexion à Firestore
+
 
 GS_DEFAULT_ACL = None  
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
