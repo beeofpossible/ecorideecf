@@ -50,5 +50,6 @@ urlpatterns = [
     path('staff/temoignage/<int:instance_id>/', views.gestion_temoignage, name='gestion_temoignage'),
     path('staff/factures/', views.liste_factures, name='liste_factures'),
     path('staff/factures/<int:facture_id>/', views.detail_facture, name='detail_facture'),
+    path('facture/<int:facture_id>/marquer-payee/', views.marquer_paye, name='marquer_paye'),
     path('presentation-utilisateur/<int:pk>/json/', views.presentation_utilisateur_json, name='presentation_utilisateur_json'),
 ]
