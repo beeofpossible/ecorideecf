@@ -93,9 +93,9 @@
     
     <!-- Texte à gauche -->
     <div class="card-body" style="flex: 1;">
-      <h4 class="card-title">{{ premier_profil.titre }}</h4>
-      <h6 class="card-subtitle mb-2 text-muted">{{ premier_profil.sous_titre }}</h6>
-      <p class="card-text">{{ premier_profil.description_courte }}</p>
+      <h4 class="card-title">{{ premier_profil.titre|safe }}</h4>
+      <h6 class="card-subtitle mb-2 text-muted">{{ premier_profil.sous_titre|safe }}</h6>
+      <p class="card-text">{{ premier_profil.description_courte|safe }}</p>
     </div>
 
     <!-- Image à droite -->

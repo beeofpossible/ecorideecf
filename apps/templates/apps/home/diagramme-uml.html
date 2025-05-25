@@ -1,8 +1,25 @@
 {%load static%}
 <h2>Installation de la base de données postgresql</h2>
 
-<p>L'utilisation de DBeaver pour manipuler des données s'impose pour sa facilité.</p>
+<a>Télecharger le schéma UML</a>
+<a>Télécharger la base de données</a>
 
+<p>L'utilisation de DBeaver pour manipuler des données s'impose pour sa facilité.</p>
+<p>Vérifions déjà le contenu des tables migrées depuis Django</p>
+
+<div>
+    <h3>Vérification des tables crées via la commande /dt</h3>
+    <img src="{%static 'img/img2.png'%}" src="DBeaver">
+</div>
+<div>
+    <h3>Vérification de la table django_migrations</h3>
+    <img src="{%static 'img/psql1.png'%}" src="DBeaver">
+    <p>Toutes les migrations se trouvent bien dans le fichier.</p>
+</div>
+<div>
+    <h3>La table "Voitures" avec toutes ses entrées</h3>
+    <img src="{%static 'img/img3.png'%}" src="DBeaver">
+</div>
 <div>
     <h3>Initialisation de DBeaver</h3>
     <img src="{%static 'img/image3.png'%}" src="DBeaver">
