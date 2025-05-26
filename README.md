@@ -13,7 +13,12 @@ Le lien pour accéder au schéma UML ainsi qu'à la base de données se trouve s
 Ce lien mène vers un lien de téléchargement wetransfer (valable 3j) pour télécharger les différents parcours utilisateurs, avec leurs différentes explications. 
 Lien : https://we.tl/t-k0FntQVfS5
 
+Le lien vers le design figma se trouve ici : 
+https://www.figma.com/proto/dbGSqUXDVmRwE9pgNplnY2/ecoride-ecf?node-id=0-1&t=oyws34J6XlnTPju9-1
 
+En revanche, je ne suis pas designeuse. Je sais utiliser l'API de figma et faire des call dessus, mais pas me servir correctement de figma.
+
+J'ai utilisé un outil pour retranscrire le code HTML de mon site internet (si je devais travailler avec un.e UX/UI designer). 
 
 Pour déployer l'application sur vos serveurs, suivez les manipulations suivantes : 
 
