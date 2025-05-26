@@ -1,6 +1,47 @@
-{% extends 'apps/layouts/base.html' %}
-{% block content %}
+{% extends "apps/layouts/base.html" %}
+{% load static %}
 
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+
+        <!-- Menu utilisateur (30%) -->
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm p-3">
+                <h5 class="mb-3"><i class="fas fa-user-circle"></i> Menu utilisateur</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:dashboard' %}"><i class="fas fa-home"></i> Tableau de bord</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:mes_voyages' %}"><i class="fas fa-car-side"></i> Covoiturages</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:creer-voyage' %}"><i class="fas fa-plus-circle"></i> Créer un voyage</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:messagerie' %}"><i class="fas fa-comments"></i> Messagerie</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:ajouter-moyen-paiement' %}"><i class="fas fa-credit-card"></i> Paiement</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:ajouter_voiture' %}"><i class="fas fa-car"></i> Ajouter un véhicule</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:signaler_litige' %}"><i class="fas fa-exclamation-triangle"></i> Signaler un litige</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'apps:deconnexion' %}"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contenu principal (70%) -->
+        <div class="col-md-9">
+            <div class="card shadow-sm p-4">
+                <h2 class="mb-4"><i class="fas fa-tachometer-alt"></i> Covoiturages</h2>
 {% for voyage in voyages_conducteur %}
     <div class="card mb-3 p-3">
         <h5>{{ voyage.titre }}</h5>
@@ -51,6 +92,8 @@
             <p class="text-muted">Vous ne participez à aucun voyage.</p>
         {% endif %}
     </div>
+</div>
+</div>
 </div>
 
 {% endblock %}
