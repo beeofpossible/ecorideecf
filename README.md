@@ -6,7 +6,8 @@ Merci de venir voir mon projet ecoride.
 Ici vous retrouverez le lien pour accéder à l'application : [ecorideecf](https://ecorideecf-production.up.railway.app/)
 
 Cette application a été lancée sur un serveur Railway. 
-Il s'agit d'une application dévéloppée en Django, PostgreSQL, HTML et CSS. J'utilise également Boostrap. 
+Il s'agit d'une application dévéloppée en Django, PostgreSQL, HTML et CSS. La base de données NoSQL est stockée sur firebase. J'utilise également Bootstrap. 
+Il n'y a pas de déploiement sur Docker, parce que non-nécessaire sur un projet Django. 
 
 Le lien pour accéder au schéma UML ainsi qu'à la base de données se trouve sur le site internet. 
 
