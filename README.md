@@ -24,9 +24,10 @@ La charte graphique a été choisie à partir des couleurs du logo et des diffé
 
 Il permet de déterminer les couleurs sous différents formats (rgb, hex...).
 
-Les images ont été produites par pixlr.com/image-generator/ ou choisies libres de droit. 
+Les images ont été produites par https://pixlr.com/image-generator/ ou choisies libres de droit. 
 
 Je me suis inspirée du design du site de foncia et de blablacar. 
+
 
 Pour déployer l'application sur vos serveurs, suivez les manipulations suivantes : 
 
