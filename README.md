@@ -18,7 +18,15 @@ https://www.figma.com/proto/dbGSqUXDVmRwE9pgNplnY2/ecoride-ecf?node-id=0-1&t=oyw
 
 En revanche, je ne suis pas designeuse. Je sais utiliser l'API de figma et faire des call dessus, mais pas me servir correctement de figma.
 
-J'ai utilisé un outil pour retranscrire le code HTML de mon site internet (si je devais travailler avec un.e UX/UI designer). 
+J'ai utilisé un outil pour retranscrire le code HTML de mon site internet. J'ai crée un design en fonction d'expériences précédentes. 
+
+La charte graphique a été choisie à partir des couleurs du logo et des différentes images, grâce à cet outil : https://imagecolorpicker.com/fr
+
+Il permet de déterminer les couleurs sous différents formats (rgb, hex...).
+
+Les images ont été produites par pixlr.com/image-generator/ ou choisies libres de droit. 
+
+Je me suis inspirée du design du site de foncia et de blablacar. 
 
 Pour déployer l'application sur vos serveurs, suivez les manipulations suivantes : 
 
