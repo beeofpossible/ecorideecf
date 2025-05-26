@@ -6,7 +6,7 @@ Bienvenue, et merci de jeter un œil à mon projet **EcoRide** !
 
 ## 🔗 Lien vers l'application
 L’application est hébergée sur **Railway** :  
-👉 [Accéder à EcoRide](https://ecorideecf.railway.app) *(remplace si lien différent)*
+👉 [Accéder à EcoRide](https://ecorideecf.railway.app) 
 
 ---
 
