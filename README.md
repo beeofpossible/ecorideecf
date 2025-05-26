@@ -1,79 +1,97 @@
-﻿# ecorideecf
+# 🌱 EcoRide - Projet ECF
 
-Bonjour ! 
-Merci de venir voir mon projet ecoride. 
- 
-Ici vous retrouverez le lien pour accéder à l'application : [ecorideecf](https://ecorideecf-production.up.railway.app/)
+Bienvenue, et merci de jeter un œil à mon projet **EcoRide** !
 
-Cette application a été lancée sur un serveur Railway. 
-Il s'agit d'une application dévéloppée en Django, PostgreSQL, HTML et CSS. La base de données NoSQL est stockée sur firebase. J'utilise également Bootstrap. 
-Il n'y a pas de déploiement sur Docker, parce que non-nécessaire sur un projet Django. 
+---
 
-Le lien pour accéder au schéma UML ainsi qu'à la base de données se trouve sur le site internet. 
+## 🔗 Lien vers l'application
+L’application est hébergée sur **Railway** :  
+👉 [Accéder à EcoRide](https://ecorideecf.railway.app) *(remplace si lien différent)*
 
-Ce lien mène vers un lien de téléchargement wetransfer (valable 3j) pour télécharger les différents parcours utilisateurs, avec leurs différentes explications. 
-Lien : https://we.tl/t-k0FntQVfS5
+---
 
-Le lien vers le design figma se trouve ici : 
-https://www.figma.com/proto/dbGSqUXDVmRwE9pgNplnY2/ecoride-ecf?node-id=0-1&t=oyws34J6XlnTPju9-1
+## 🛠️ Stack Technique
 
-En revanche, je ne suis pas designeuse. Je sais utiliser l'API de figma et faire des call dessus, mais pas me servir correctement de figma.
+- **Backend** : Django (Python)
+- **Base de données relationnelle** : PostgreSQL (hébergée sur Railway)
+- **Base de données NoSQL** : Firebase
+- **Frontend** : HTML, CSS, Bootstrap
+- **Hébergement** : Railway (pas de Docker ici, ce n’était pas nécessaire)
+- **Design** : Figma (généré à partir du code HTML)
 
-J'ai utilisé un outil pour retranscrire le code HTML de mon site internet. J'ai crée un design en fonction d'expériences précédentes. 
+---
 
-La charte graphique a été choisie à partir des couleurs du logo et des différentes images, grâce à cet outil : https://imagecolorpicker.com/fr
+## 🎨 Design & UX
 
-Il permet de déterminer les couleurs sous différents formats (rgb, hex...).
+- 📄 **Parcours utilisateurs (PDF)** : [Lien WeTransfer (valide 3 jours)](https://we.tl/t-k0FntQVfS5)
+- 🖌️ **Maquette Figma** : [Voir sur Figma](https://www.figma.com/proto/dbGSqUXDVmRwE9pgNplnY2/ecoride-ecf?node-id=0-1&t=oyws34J6XlnTPju9-1)
 
-Les images ont été produites par https://pixlr.com/image-generator/ ou choisies libres de droit. 
+> ⚠️ Je ne suis pas designeuse, mais j’ai utilisé mes expériences précédentes et des outils comme l’API Figma pour créer l’interface.
 
-Je me suis inspirée du design du site de foncia et de blablacar. 
+### Inspirations design :
+- [Foncia](https://www.foncia.com)
+- [BlaBlaCar](https://www.blablacar.fr)
 
+### Charte graphique :
+Créée à partir des couleurs du logo/images avec cet outil génial :  
+🎨 [imagecolorpicker.com](https://imagecolorpicker.com/fr)
 
-Pour déployer l'application sur vos serveurs, suivez les manipulations suivantes : 
+### Images :
+- Générées via : [pixlr.com/image-generator](https://pixlr.com/image-generator/)
+- Ou libres de droit
 
-Pré-requis : 
+---
 
-Python (3.8+)
+## 🗃️ Schéma UML & base de données
 
-pip 
+Le schéma UML et la structure de la base de données sont disponibles directement sur le site de l’application.
 
-Git
+---
 
-virtualenv ou venv
+## 🧪 Déploiement en local
 
+### ✅ Pré-requis :
+- Python 3.8+
+- `pip`
+- `git`
+- `virtualenv` ou `venv`
+
+---
+
+### 👇 Étapes d’installation
+
+```bash
+# Cloner le projet
 git clone https://github.com/beeofpossible/ecorideecf.git
-
 cd ecorideecf
 
-Sous Windows : 
+#Sous Windows :
 
 python -m venv env
-
 env\Scripts\activate
 
-
-Sous Mac: 
+#Sous macOS/Linux :
 
 python3 -m venv env
+source env/bin/activate
 
-source env/bin/activate 
-
-Installer les dépendances : 
+#🔧 Installer les dépendances :
 
 pip install -r requirements.txt
 
-Appliquer les migrations : 
+#📦 Appliquer les migrations :
 
-py main.py makemigrations 
+python main.py makemigrations
+python main.py migrate
 
-py main.py migrate 
+#👤 Créer un superutilisateur :
 
-Créer un superutilisateur :
+python main.py createsuperuser
 
-py main.py createsuperuser
+#🚀 Lancer le serveur local :
 
-Lancer le serveur :
-
-py main.py runserver
-
+python main.py runserver
+'''
+🙌 Merci !
+N’hésitez pas à explorer le code, tester, forker ou poser vos questions.
+Et surtout… merci encore d’être passé·e voir EcoRide !
