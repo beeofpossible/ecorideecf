@@ -1,186 +1,179 @@
 {% extends "apps/layouts/base.html" %}
 {% load static %}
-<!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 <body>
-<h1>Voyages disponibles</h1>
+<h1 class="text-center mb-4">Voyages disponibles</h1>
 
 <div class="container-fluid">
     <div class="row">
         <!-- Filtres (30%) -->
-        <div class="col-md-3">
+        <div class="col-md-3 mb-4">
             <div class="card p-3 shadow-sm">
                 <h4>Filtres</h4>
                 <form method="get">
+                    <!-- Ville de départ -->
                     <div class="mb-3">
                         <label class="form-label">Ville de départ</label>
-                        <input type="text" name="depart" id="id_depart" class="form-control">
+                        <select name="depart" class="form-select">
+                            <option value="">Toutes</option>
+                            {% for ville in villes_depart %}
+                                <option value="{{ ville }}" {% if request_get.depart == ville %}selected{% endif %}>{{ ville }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+
+                    <!-- Ville d’arrivée -->
                     <div class="mb-3">
                         <label class="form-label">Ville d’arrivée</label>
-                        <input type="text" name="arrivee" id="id_arrivee" class="form-control" >
+                        <select name="arrivee" class="form-select">
+                            <option value="">Toutes</option>
+                            {% for ville in villes_arrivee %}
+                                <option value="{{ ville }}" {% if request_get.arrivee == ville %}selected{% endif %}>{{ ville }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+
+                    <!-- Date -->
                     <div class="mb-3">
                         <label class="form-label">Date</label>
-                        <input type="date" name="date" class="form-control">
+                        <input type="date" name="date" class="form-control" value="{{ request_get.date }}">
                     </div>
+
+                    <!-- Écologique -->
+                    <div class="mb-3">
+                        <label class="form-label">Écologique</label>
+                        <select name="ecologique" class="form-select">
+                            <option value="">Tous</option>
+                            <option value="oui" {% if request_get.ecologique == 'oui' %}selected{% endif %}>Oui</option>
+                            <option value="non" {% if request_get.ecologique == 'non' %}selected{% endif %}>Non</option>
+                        </select>
+                    </div>
+
+                    <!-- Conducteur avec avis -->
                     <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="ecologique" id="ecologique" {% if request.GET.ecologique %}checked{% endif %}>
-                    <label class="form-check-label" for="ecologique">
-                     Voyage écologique seulement
-                    </label>
+                        <input class="form-check-input" type="checkbox" name="avec_avis" id="avec_avis" {% if request_get.avec_avis %}checked{% endif %}>
+                        <label class="form-check-label" for="avec_avis">Uniquement les conducteurs avec avis</label>
                     </div>
-                    <div class="form-check mb-2">
-    <input class="form-check-input" type="checkbox" name="non_ecologique" id="non_ecologique" {% if request.GET.non_ecologique %}checked{% endif %}>
-    <label class="form-check-label" for="non_ecologique">Voyage non écologique seulement</label>
-</div>
 
-<div class="form-check mb-3">
-    <input class="form-check-input" type="checkbox" name="avec_avis" id="avec_avis" {% if request.GET.avec_avis %}checked{% endif %}>
-    <label class="form-check-label" for="avec_avis">Uniquement les conducteurs avec avis</label>
-</div>
-
-                    <div class="mb-3">
-                     <label for="rayon" class="form-label">Rayon de recherche (km) : <span id="rayon-val">{{ request.GET.rayon|default:50 }}</span> km</label>
-                         <input type="range" class="form-range" min="1" max="200" step="1" id="rayon" name="rayon"
-                              value="{{ request.GET.rayon|default:50 }}">
-                    </div>
-                    <div class="mb-3">
-    <label class="form-label">Note minimale</label>
-    <div id="star-filter" class="d-flex align-items-center" style="gap: 5px; cursor: pointer;">
-        {% for i in "12345" %}
-            <i class="fa fa-star-o star-icon" data-value="{{ forloop.counter }}" style="font-size: 1.5rem; color: #ccc;"></i>
-        {% endfor %}
-    </div>
-    <input type="hidden" name="note_min" id="note_min" value="{{ request.GET.note_min|default:"0" }}">
-</div>
                     <button type="submit" class="btn btn-outline-success w-100">Rechercher</button>
                 </form>
             </div>
         </div>
 
-<!-- Liste des voyages (70%) -->
-<div class="col-md-9">
-    <div class="row">
-        {% for voyage in voyages %}
-        <div class="col-12 mb-4">
-            <a href="{% url 'apps:voyages-single' voyage.id %}" class="text-decoration-none text-dark">
-                <div class="card shadow-lg p-4 hover-shadow h-100 d-flex flex-column justify-content-between">
-                    {% if voyage.ecologique %}
-                        <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-success">
-                                <i class="fas fa-leaf"></i> Écologique
-                            </span>
-                        </div>
-                    {% endif %}
-                    <div>
-                        <h5 class="card-title"><i class="fas fa-route"></i> {{ voyage.titre }}</h5>
-                        <p class="card-text mb-2">
-                            <i class="fas fa-map-marker-alt"></i> <strong>De :</strong> {{ voyage.depart }} → <strong>{{ voyage.arrivee }}</strong><br>
-                            <i class="fas fa-calendar-alt"></i> <strong>Départ :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}
-                        </p>
-                    </div>
-
-                    <hr>
-
-                    <!-- Section du bas -->
-                    <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <!-- Utilisateur + places + prix -->
-                        <div class="d-flex align-items-center flex-wrap gap-3">
-                            <div class="d-flex align-items-center">
-                                {% if profil.photo %}
-                                    <img src="{{ profil.photo.url }}" alt="Photo de profil" class="profil-mini-card me-2">
-                                {% elif profil.photo_url %}
-                                    <img src="{{ profil.photo_url }}" alt="Photo de profil" class="profil-mini-card me-2">
-                                {% else %}
-                                    <img src="{% static 'img/autoroute.png' %}" alt="Photo par défaut" class="profil-mini-card me-2">
-                                {% endif %}
-                                    <div>
-        <strong>{{ voyage.conducteur.username }}</strong><br>
-        {% if voyage.moyenne_avis %}
-            {% with moyenne=voyage.moyenne_avis|floatformat:0 %}
-                {% for i in "12345" %}
-                    {% if forloop.counter <= moyenne %}
-                        <i class="fas fa-star text-warning"></i>
-                    {% else %}
-                        <i class="far fa-star text-warning"></i>
-                    {% endif %}
-                {% endfor %}
-            {% endwith %}
-            <small class="text-muted ms-1">({{ voyage.avis.count }})</small>
-        {% else %}
-            <small class="text-muted">Aucun avis</small>
-        {% endif %}
-    </div>
-</div>
-
-                    
-                            <span><i class="fas fa-chair"></i> <strong>Places :</strong> {{ voyage.places_disponibles }}</span>
-                            <span><i class="fas fa-euro-sign"></i> <strong>Prix :</strong> {{ voyage.prix }} €</span>
-                        </div>
-
-                        <!-- Bouton -->
-                        <div class="mt-2 mt-md-0">
-                            {% if user.is_authenticated %}
-                                <a href="{% url 'apps:voyages-single' voyage.id %}" class="btn btn-outline-primary">
-                                    Voir le voyage <i class="fas fa-arrow-right"></i>
-                                </a>
-                            {% else %}
-                                <a href="{% url 'apps:connexion' %}" class="btn btn-outline-success">
-                                    Se connecter pour voir <i class="fas fa-lock"></i>
-                                </a>
+        <!-- Liste des voyages (70%) -->
+        <div class="col-md-9">
+            <div class="row">
+                {% for voyage in voyages %}
+                <div class="col-12 mb-4">
+                    <a href="{% url 'apps:voyages-single' voyage.id %}" class="text-decoration-none text-dark">
+                        <div class="card shadow-lg p-4 hover-shadow h-100 d-flex flex-column justify-content-between position-relative">
+                            
+                            {% if voyage.ecologique %}
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-leaf"></i> Écologique
+                                </span>
+                            </div>
                             {% endif %}
+
+                            <!-- Titre et trajet -->
+                            <div>
+                                <h5 class="card-title"><i class="fas fa-route"></i> {{ voyage.titre }}</h5>
+                                <p class="card-text mb-2">
+                                    <i class="fas fa-map-marker-alt"></i> <strong>De :</strong> {{ voyage.depart }} → <strong>{{ voyage.arrivee }}</strong><br>
+                                    <i class="fas fa-calendar-alt"></i> <strong>Départ :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+
+                            <hr>
+
+                            <!-- Informations en bas -->
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <!-- Conducteur, places et prix -->
+                                <div class="d-flex align-items-center flex-wrap gap-3">
+                                    <div class="d-flex align-items-center">
+                                        {% if voyage.conducteur.profilutilisateur.photo_profil %}
+                                            <img src="{{ voyage.conducteur.profilutilisateur.photo_profil.url }}" alt="Photo de profil" class="profil-mini-card me-2 rounded-circle" style="width:40px;height:40px;">
+                                        {% else %}
+                                            <img src="{% static 'img/autoroute.png' %}" alt="Photo par défaut" class="profil-mini-card me-2 rounded-circle" style="width:40px;height:40px;">
+                                        {% endif %}
+                                        <div>
+                                            <strong>{{ voyage.conducteur.username }}</strong><br>
+                                            {% if voyage.moyenne_avis %}
+                                                {% with moyenne=voyage.moyenne_avis|floatformat:0 %}
+                                                    {% for i in "12345" %}
+                                                        {% if forloop.counter <= moyenne %}
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star text-warning"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                                <small class="text-muted ms-1">({{ voyage.avis.count }})</small>
+                                            {% else %}
+                                                <small class="text-muted">Aucun avis</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <span><i class="fas fa-chair"></i> <strong>Places :</strong> {{ voyage.places_disponibles }}</span>
+                                    <span><i class="fas fa-euro-sign"></i> <strong>Prix :</strong> {{ voyage.prix }} €</span>
+                                </div>
+
+                                <!-- Bouton -->
+                                <div class="mt-2 mt-md-0">
+                                    {% if user.is_authenticated %}
+                                        <a href="{% url 'apps:voyages-single' voyage.id %}" class="btn btn-outline-primary">
+                                            Voir le voyage <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'apps:connexion' %}" class="btn btn-outline-success">
+                                            Se connecter <i class="fas fa-lock"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
-            </a>
-        </div>
-        {% empty %}
-        <p class="text-muted">Aucun voyage disponible pour le moment.</p>
-        {% endfor %}
-   
-      
-    
-
-        <!-- Pagination -->
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mt-4">
-                {% if voyages.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ voyages.previous_page_number }}" aria-label="Précédent">
-                            &laquo;
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                {% endif %}
-
-                {% for num in voyages.paginator.page_range %}
-                    {% if voyages.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% elif num >= voyages.number|add:-2 and num <= voyages.number|add:2 %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                    {% endif %}
+                {% empty %}
+                <p class="text-muted">Aucun voyage disponible pour le moment.</p>
                 {% endfor %}
+            </div>
 
-                {% if voyages.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ voyages.next_page_number }}" aria-label="Suivant">
-                            &raquo;
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                {% endif %}
-            </ul>
-        </nav>
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if voyages.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ voyages.previous_page_number }}" aria-label="Précédent">&laquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+
+                    {% for num in voyages.paginator.page_range %}
+                        {% if voyages.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num >= voyages.number|add:-2 and num <= voyages.number|add:2 %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if voyages.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ voyages.next_page_number }}" aria-label="Suivant">&raquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 
-
-    {% endblock content %}
-
-    <!-- Specific Page JS goes HERE  -->
-    {% block javascripts %}{% endblock javascripts %}
+{% endblock content %}
+{% block javascripts %}{% endblock javascripts %}
