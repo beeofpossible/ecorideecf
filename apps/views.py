@@ -31,9 +31,12 @@ from django.db.models.functions import TruncDate
 def uml(request):
     return render(request, "apps/home/diagramme-uml.html")
 
+#Espace Administrateur 
+
+#Empêcher la connexion à des personnes qui ne sont pas administrateurs au panel admin
 def superuser_required(view_func):
     return user_passes_test(lambda u: u.is_superuser)(view_func)
-
+# Administrateur - Créer un Employé
 @superuser_required
 def creer_employe(request):
     if request.method == 'POST':
@@ -54,6 +57,7 @@ def creer_employe(request):
 
     return JsonResponse({'success': False, 'error': "Requête invalide."})
 
+#Dashboard Admin
 @superuser_required
 def espace_admin(request):
     site = Site.objects.first()
@@ -107,7 +111,7 @@ def espace_admin(request):
         'total_credit': total_credit,
         'users': users,
     })
-    
+#Administrateur - Suspendre un utilisateur     
 @superuser_required
 def suspendre_utilisateur(request, user_id):
     user = get_object_or_404(User, pk=user_id)
@@ -116,6 +120,7 @@ def suspendre_utilisateur(request, user_id):
     messages.success(request, f"{user.username} a été suspendu.")
     return redirect('apps:espace_admin')
 
+#Administrateur - Réactiver un utilisateur
 @superuser_required
 def reactiver_utilisateur(request, user_id):
     user = get_object_or_404(User, pk=user_id)
@@ -124,6 +129,7 @@ def reactiver_utilisateur(request, user_id):
     messages.success(request, f"{user.username} a été réactivé.")
     return redirect('apps:espace_admin')
 
+#Passager/conducteur - inscription
 def inscription_view(request):
     site = Site.objects.first()
     if request.method == 'POST':
@@ -140,12 +146,14 @@ def inscription_view(request):
         form = InscriptionForm()
     return render(request, 'apps/user/inscription.html', {'form': form, 'site': site,})
 
+#Tous profils - déconnexion
 def deconnexion_view(request):
     
     logout(request)
     messages.info(request, "Vous avez été déconnecté.")
     return redirect('apps:connexion')
 
+#Tous profils - connexion 
 def connexion_view(request):
     site = Site.objects.first()
     if request.method == 'POST':
@@ -166,7 +174,7 @@ def connexion_view(request):
 
     return render(request, 'apps/user/connexion.html', {'form': form, 'site':site,})
 
-
+#Conducteur/Passager - récupérer les informations du profil
 def presentation_utilisateur_json(request, pk):
     profil = PresentationUtilisateur.objects.get(pk=pk)
     return JsonResponse({
@@ -185,6 +193,7 @@ def presentation_utilisateur_json(request, pk):
         "raison_3_icone": profil.raison_3_icone or "",
     })
 
+#Site Vitrine - index 
 def index(request):
     site = Site.objects.first()
     profils = PresentationUtilisateur.objects.all()
@@ -225,7 +234,7 @@ def index(request):
         'voyages_populaires': voyages_details,
     })
 
-
+# Passager/conducteur - Dashboard
 def dashboard_view(request):
     user = request.user
     site = Site.objects.first()
@@ -252,21 +261,25 @@ def dashboard_view(request):
     }
     return render(request, 'apps/user/dashboard.html', context)
 
+# Gestionnaire - Dashboard
 @staff_member_required
 def espace_staff(request):
     site = Site.objects.first()
     return render(request, "apps/admin/espace-staff.html", {'site':site} )
 
+#Gestionnaire - accéder aux voyages (single)
 @staff_member_required
 def detail_voyage_admin(request, voyage_id):
     voyage = get_object_or_404(Voyage, id=voyage_id)
     return render(request, 'apps/admin/covoiturage_detail.html', {'voyage': voyage})
 
+#Gestionnaire - accéder à la liste des voyages 
 @staff_member_required
 def liste_voyages_admin(request):
     voyages = Voyage.objects.all().order_by('-date_depart')
     return render(request, 'apps/admin/covoiturages-list.html', {'voyages': voyages})
 
+#Gestionnaire - Modifier un voyage 
 @staff_member_required
 def modifier_voyage_admin(request, voyage_id):
     voyage = get_object_or_404(Voyage, id=voyage_id)
@@ -279,7 +292,7 @@ def modifier_voyage_admin(request, voyage_id):
         form = VoyageForm(instance=voyage)
 
     return render(request, 'apps/admin/modifier_voyage.html', {'form': form, 'voyage': voyage})
-
+#Gestionnaire - Supprimer un voyage 
 @staff_member_required
 def supprimer_voyage_admin(request, voyage_id):
     voyage = get_object_or_404(Voyage, id=voyage_id)
@@ -288,7 +301,7 @@ def supprimer_voyage_admin(request, voyage_id):
         return redirect('apps:liste_voyages_admin')
     return render(request, 'apps/admin/confirmer_suppression_voyage.html', {'voyage': voyage})
 
-
+#Vitrine - Page de contact
 def contact(request):
     site = Site.objects.first()
     success = False
@@ -308,6 +321,7 @@ def contact(request):
 
     return render(request, "apps/home/contact.html", {"success": success, 'site':site})
 
+#Tous profils - Messagerie 
 @login_required
 def messagerie_view(request, litige_id=None):
     user = request.user
@@ -361,6 +375,7 @@ def messagerie_view(request, litige_id=None):
             'messages_envoyes': messages_envoyes,
         })
         
+#Accès à l'API nominatim         
 def geocode_city(city_name):
     """Retourne (lat, lon) pour une ville via l'API de Nominatim."""
     url = 'https://nominatim.openstreetmap.org/search'
@@ -375,6 +390,7 @@ def geocode_city(city_name):
         return float(results[0]['lat']), float(results[0]['lon'])
     return None
         
+#Vitrine - Liste des voyages         
 def liste_voyages(request):
     site = Site.objects.first()
     voyages_qs = Voyage.objects.annotate(
@@ -440,6 +456,10 @@ def liste_voyages(request):
         'site': site
     })
 
+def voyage_single(request):
+    return render(request, "apps/home/voyage-single.html")
+
+#Vitrine - Réserver un voyage (connexion obligatoire)
 def reserver_voyage(request, voyage_id):
     site = Site.objects.first()
     voyage = get_object_or_404(Voyage, id=voyage_id)
@@ -458,6 +478,8 @@ def reserver_voyage(request, voyage_id):
         else:
             return redirect('apps:connexion')
     return render(request, 'apps/home/reserver-voyage.html', {'voyage': voyage, 'site': site,})
+
+#Passager/conducteur - Voir les voyages réservés
 @login_required
 def mes_voyages(request):
     utilisateur = request.user
@@ -469,6 +491,7 @@ def mes_voyages(request):
         'voyages_passager': voyages_passager,
     })
 
+#Passager/conducteur - Démarrer un Voyage depuis l'application
 @login_required
 def demarrer_voyage(request, voyage_id):
     voyage = get_object_or_404(Voyage, id=voyage_id, conducteur=request.user)
@@ -478,6 +501,7 @@ def demarrer_voyage(request, voyage_id):
         messages.success(request, "Voyage démarré.")
     return redirect('apps:mes_voyages')
 
+#Passager/conducteur - laisser un avis 
 def send_mail_avis(passager, voyage):
     send_mail(
         subject="Merci de valider votre covoiturage",
@@ -485,7 +509,7 @@ def send_mail_avis(passager, voyage):
         from_email="noreply@tonsite.com",
         recipient_list=[passager.email],
     )
-
+#Passager/conducteur - Terminer un voyage 
 @login_required
 def terminer_voyage(request, voyage_id):
     voyage = get_object_or_404(Voyage, id=voyage_id, conducteur=request.user)
@@ -498,6 +522,7 @@ def terminer_voyage(request, voyage_id):
         messages.success(request, "Voyage terminé. Les passagers vont être notifiés.")
     return redirect('apps:mes_voyages')
 
+#Conducteur - Créer un voyage
 @login_required
 def creer_voyage(request):
     profil = request.user.profilutilisateur
@@ -521,6 +546,7 @@ def creer_voyage(request):
 
     return render(request, 'apps/user/creer-voyage.html', {'form': form, 'site': site})
 
+#Passager/conducteur - Ajouter un moyen de paiement 
 @login_required
 def ajouter_moyen_paiement(request):
     site = Site.objects.first()
@@ -535,6 +561,7 @@ def ajouter_moyen_paiement(request):
         form = MoyenPaiementForm()
     return render(request, 'apps/user/add_moyens_paiement.html', {'form': form, 'site':site,})
 
+#Passager/conducteur - Acheter des crédits
 @login_required
 def acheter_credits(request):
     site = Site.objects.first()
@@ -564,11 +591,12 @@ def acheter_credits(request):
         'moyens_paiement': moyens,
     })
 
+#Gestionnaire - accès au détail des litiges 
 @staff_member_required
 def litige_detail(request, litige_id):
     litige = get_object_or_404(Litige, id=litige_id)
     return render(request, 'apps/admin/litige_detail.html', {'litige': litige})
-
+#Gestionnaire - liste des litiges 
 @staff_member_required
 def liste_litiges(request):
     litiges_list = Litige.objects.all().order_by('-date_ouverture')
@@ -578,12 +606,14 @@ def liste_litiges(request):
 
     return render(request, 'apps/admin/litiges.html', {'litiges': litiges})
 
+#Gestionnaire - clôre un litige
 @staff_member_required
 def supprimer_litige(request, litige_id):
     litige = get_object_or_404(Litige, id=litige_id)
     litige.delete()
     return redirect('apps:liste_litiges')
 
+#Passager/conducteur - Signaler un litige 
 @login_required
 def signaler_litige(request):
     site = Site.objects.first()
@@ -599,6 +629,7 @@ def signaler_litige(request):
 
     return render(request, 'apps/user/litiges.html', {'form': form, "site": site,})
 
+#Passager/conducteur - Laisser un avis 
 @login_required
 def laisser_avis(request, voyage_id):
     site = Site.objects.first()
@@ -623,6 +654,7 @@ def laisser_avis(request, voyage_id):
 
     return render(request, 'apps/user/laisser-avis.html', {'form': form, 'voyage': voyage, 'site': site})
 
+#Passager/conducteur - Voir les crédits restants sur le compte 
 @login_required
 def mes_credits(request):
     site = Site.objects.first()
@@ -636,7 +668,7 @@ def mes_credits(request):
     })
     
 
-
+#Passager/conducteur - Réserver un Voyage 
 @login_required
 def reserver_voyage(request, voyage_id):
     site = Site.objects.first()
@@ -684,7 +716,8 @@ def reserver_voyage(request, voyage_id):
         'credit_disponible': credit.montant,
         'site': site
     })
-            
+
+#Passager/conducteur - Settings            
 @login_required
 def settings_view(request):
     profil = request.user.profilutilisateur
@@ -710,7 +743,7 @@ def settings_view(request):
     })
 
     
-
+#Gestionnaire - liste des avis
 @staff_member_required
 def avis_liste(request):
     site = Site.objects.first()
@@ -725,6 +758,7 @@ def avis_liste(request):
         'site': site,
     })
 
+#Gestionnaire - valider un avis après relecture
 @staff_member_required
 def valider_avis(request, avis_id):
     avis = get_object_or_404(Avi, id=avis_id)
@@ -732,13 +766,14 @@ def valider_avis(request, avis_id):
     avis.save()
     return redirect('apps:avis_liste')
 
-
+#Gestionnaire - Supprimer un avis après relecture 
 @staff_member_required
 def supprimer_avis(request, avis_id):
     avis = get_object_or_404(Avi, id=avis_id)
     avis.delete()
     return redirect('apps:avis_liste')
 
+#API - Marque des véhicules 
 def get_modeles(request):
     marque = request.GET.get('marque')
     if not marque:
@@ -752,6 +787,7 @@ def get_modeles(request):
         return JsonResponse({'modeles': modeles})
     return JsonResponse({'error': 'Échec de l’appel API'}, status=500)
 
+#Conducteur - Ajouter un véhicule
 def ajouter_voiture(request):
     site = Site.objects.first()
     marques = ["Toyota", "Renault", "BMW", "Peugeot", "Mercedes", "Audi", "Volkswagen"]  # Exemples de marques
@@ -772,6 +808,7 @@ def ajouter_voiture(request):
         'marques': marques
     })
 
+#Vitrine - Ajouter des pages (blog ou témoignage)
 def page_detail(request, page_id):
     site = Site.objects.first()
     page = Page.objects.get(id=page_id)
@@ -781,6 +818,7 @@ def page_detail(request, page_id):
         'site':site,
     })
     
+#Vitrine - Gestion des pages (blog ou témoignage)    
 def gestion_pages(request, page_id=None):
     site = Site.objects.first()
     page_instance = get_object_or_404(Page, id=page_id) if page_id else None
@@ -823,6 +861,8 @@ def gestion_pages(request, page_id=None):
         'selected_type': type_page,
         'page_instance': page_instance
     })
+    
+#Conducteur/passager - Présentation de l'utilisateur     
 def presentation_utilisateur_detail(request, page_id):
     site = Site.objects.first()
     page = PresentationUtilisateur.objects.get(id=page_id)
@@ -831,7 +871,7 @@ def presentation_utilisateur_detail(request, page_id):
         'site':site,
         'page': page,
     })
-
+#Vitrine - Page détail (Témoignage)
 def temoignage_detail(request, page_id):
     site = Site.objects.first()
     temoignage = Temoignage.objects.get(id=page_id)
@@ -840,7 +880,7 @@ def temoignage_detail(request, page_id):
         'site':site,
         'temoignage': temoignage,
     })
-
+#Conducteur/passager - Gestion de la présentation des utilisateurs
 def gestion_presentation_utilisateur(request, instance_id=None):
     site = Site.objects.first()
     instance = get_object_or_404(PresentationUtilisateur, id=instance_id) if instance_id else None
@@ -869,7 +909,7 @@ def gestion_presentation_utilisateur(request, instance_id=None):
 
 
 # === VUE COMBINÉE POUR TEMOIGNAGE ===
-
+#Vitrine -
 def gestion_temoignage(request, instance_id=None):
     site = Site.objects.first()
     instance = get_object_or_404(Temoignage, id=instance_id) if instance_id else None
