@@ -1,16 +1,18 @@
 {% extends "apps/layouts/base.html" %}
 {% load static %}
+{% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<body>
 <h1 class="text-center mb-4">Voyages disponibles</h1>
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Filtres -->
+        <!-- Filtres (30%) -->
         <div class="col-md-3 mb-4">
             <div class="card p-3 shadow-sm">
                 <h4>Filtres</h4>
-                <form id="filter-form">
+                <form id="voyage-filters">
                     <!-- Ville de départ -->
                     <div class="mb-3">
                         <label class="form-label">Ville de départ</label>
@@ -58,92 +60,133 @@
             </div>
         </div>
 
-        <!-- Liste des voyages -->
-        <div class="col-md-9">
-            <div id="voyages-container">
+        <!-- Liste des voyages (70%) -->
+        <div class="col-md-9" id="voyages-container">
+            <div class="row" id="voyage-list">
                 {% for voyage in voyages %}
-                    <div class="col-12 mb-4">
-                        <a href="{% url 'apps:voyages-single' voyage.id %}" class="text-decoration-none text-dark">
-                            <div class="card shadow-lg p-4 hover-shadow h-100 d-flex flex-column justify-content-between position-relative">
-                                {% if voyage.ecologique %}
-                                    <div class="position-absolute top-0 end-0 m-2">
-                                        <span class="badge bg-success"><i class="fas fa-leaf"></i> Écologique</span>
-                                    </div>
-                                {% endif %}
-                                <h5 class="card-title"><i class="fas fa-route"></i> {{ voyage.titre }}</h5>
-                                <p class="card-text mb-2">
-                                    <i class="fas fa-map-marker-alt"></i> <strong>De :</strong> {{ voyage.depart }} → <strong>{{ voyage.arrivee }}</strong><br>
-                                    <i class="fas fa-calendar-alt"></i> <strong>Départ :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}
-                                </p>
-                                <hr>
-                                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                                    <div class="d-flex align-items-center flex-wrap gap-3">
-                                        <div class="d-flex align-items-center">
-                                            {% if voyage.conducteur.profilutilisateur.photo_profil %}
-                                                <img src="{{ voyage.conducteur.profilutilisateur.photo_profil.url }}" alt="Photo de profil" class="profil-mini-card me-2 rounded-circle" style="width:40px;height:40px;">
-                                            {% else %}
-                                                <img src="{% static 'img/autoroute.png' %}" alt="Photo par défaut" class="profil-mini-card me-2 rounded-circle" style="width:40px;height:40px;">
-                                            {% endif %}
-                                            <div>
-                                                <strong>{{ voyage.conducteur.username }}</strong><br>
-                                                {% if voyage.moyenne_avis %}
-                                                    {% with moyenne=voyage.moyenne_avis|floatformat:0 %}
-                                                        {% for i in "12345" %}
-                                                            {% if forloop.counter <= moyenne %}
-                                                                <i class="fas fa-star text-warning"></i>
-                                                            {% else %}
-                                                                <i class="far fa-star text-warning"></i>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    {% endwith %}
-                                                    <small class="text-muted ms-1">({{ voyage.avis.count }})</small>
-                                                {% else %}
-                                                    <small class="text-muted">Aucun avis</small>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <span><i class="fas fa-chair"></i> <strong>Places :</strong> {{ voyage.places_disponibles }}</span>
-                                        <span><i class="fas fa-euro-sign"></i> <strong>Prix :</strong> {{ voyage.prix }} €</span>
-                                    </div>
-                                    <div class="mt-2 mt-md-0">
-                                        {% if user.is_authenticated %}
-                                            <a href="{% url 'apps:voyages-single' voyage.id %}" class="btn btn-outline-primary">Voir le voyage <i class="fas fa-arrow-right"></i></a>
+                <div class="col-12 mb-4">
+                    <a href="{% url 'apps:voyages-single' voyage.id %}" class="text-decoration-none text-dark">
+                        <div class="card shadow-sm p-3 position-relative">
+                            {% if voyage.ecologique %}
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-success"><i class="fas fa-leaf"></i> Écologique</span>
+                            </div>
+                            {% endif %}
+
+                            <h5 class="card-title"><i class="fas fa-route"></i> {{ voyage.titre }}</h5>
+                            <p class="mb-2">
+                                <i class="fas fa-map-marker-alt"></i> <strong>De :</strong> {{ voyage.depart }} → <strong>{{ voyage.arrivee }}</strong><br>
+                                <i class="fas fa-calendar-alt"></i> <strong>Départ :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}
+                            </p>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <div class="d-flex align-items-center flex-wrap gap-3">
+                                    <img src="{{ voyage.conducteur.profilutilisateur.photo_profil.url|default:static('img/autoroute.png') }}" 
+                                         alt="Profil" class="rounded-circle me-2" style="width:40px; height:40px;">
+                                    <div>
+                                        <strong>{{ voyage.conducteur.username }}</strong><br>
+                                        {% if voyage.moyenne_avis %}
+                                            {% with moyenne=voyage.moyenne_avis|floatformat:0 %}
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= moyenne %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endwith %}
+                                            <small class="text-muted ms-1">({{ voyage.avis.count }})</small>
                                         {% else %}
-                                            <a href="{% url 'apps:connexion' %}" class="btn btn-outline-success">Se connecter <i class="fas fa-lock"></i></a>
+                                            <small class="text-muted">Aucun avis</small>
                                         {% endif %}
                                     </div>
+                                    <span><i class="fas fa-chair"></i> {{ voyage.places_disponibles }}</span>
+                                    <span><i class="fas fa-euro-sign"></i> {{ voyage.prix }} €</span>
+                                </div>
+
+                                <div class="mt-2 mt-md-0">
+                                    {% if user.is_authenticated %}
+                                        <a href="{% url 'apps:voyages-single' voyage.id %}" class="btn btn-outline-primary btn-sm">
+                                            Voir le voyage
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'apps:connexion' %}" class="btn btn-outline-success btn-sm">
+                                            Se connecter
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </div>
-                        </a>
-                    </div>
+                        </div>
+                    </a>
+                </div>
                 {% empty %}
-                    <p class="text-muted">Aucun voyage disponible pour le moment.</p>
+                <p class="text-muted">Aucun voyage disponible pour le moment.</p>
                 {% endfor %}
             </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" id="pagination">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if voyages.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ voyages.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+                    {% for num in voyages.paginator.page_range %}
+                        {% if voyages.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num >= voyages.number|add:-2 and num <= voyages.number|add:2 %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if voyages.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ voyages.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
 {% endblock content %}
 
 {% block javascripts %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function(){
-    $('#filter-form select, #filter-form input').on('change', function(){
-        // Serialiser le formulaire
-        var data = $('#filter-form').serialize();
-        $.ajax({
-            url: "{% url 'apps:liste-voyages' %}",
-            data: data,
-            type: 'GET',
-            success: function(response){
-                // Remplacer le contenu
-                $('#voyages-container').html($(response).find('#voyages-container').html());
-            }
-        });
+function fetchVoyages() {
+    const form = document.getElementById('voyage-filters');
+    const params = new URLSearchParams(new FormData(form));
+
+    fetch(`?${params.toString()}`, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('voyage-list').innerHTML = data.html;
+        document.getElementById('pagination').innerHTML = data.pagination_html;
     });
+}
+
+// Déclencher la fonction sur chaque changement de filtre
+document.querySelectorAll('#voyage-filters select, #voyage-filters input').forEach(el => {
+    el.addEventListener('change', fetchVoyages);
+});
+
+// Déclencher la pagination Ajax
+document.addEventListener('click', function(e) {
+    if(e.target.closest('.pagination a')) {
+        e.preventDefault();
+        const url = e.target.closest('a').getAttribute('href');
+        fetch(url, { headers: {'X-Requested-With': 'XMLHttpRequest'} })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('voyage-list').innerHTML = data.html;
+                document.getElementById('pagination').innerHTML = data.pagination_html;
+            });
+    }
 });
 </script>
 {% endblock javascripts %}
-
 
