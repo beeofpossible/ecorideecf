@@ -392,47 +392,69 @@ def geocode_city(city_name):
     return None
         
 #Vitrine - Liste des voyages
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.db.models import Avg, Count
+from .models import Voyage, Site
+
+# Vitrine - Liste des voyages
 def liste_voyages(request):
     site = Site.objects.first()
+    
+    # Queryset de base avec annotations
     voyages_qs = Voyage.objects.annotate(
         moyenne_avis=Avg('avis__note'),
         nb_avis_conducteur=Count('conducteur__voyages__avis')
     ).order_by('-date_depart')
 
+    # Récupération des filtres
     depart = request.GET.get('depart')
     arrivee = request.GET.get('arrivee')
     date = request.GET.get('date')
     ecologique = request.GET.get('ecologique')
     conducteur_avec_avis = request.GET.get('avec_avis')
 
+    # Filtre écologique
     if ecologique == 'oui':
         voyages_qs = voyages_qs.filter(ecologique=True)
     elif ecologique == 'non':
         voyages_qs = voyages_qs.filter(ecologique=False)
 
+    # Filtre conducteur avec avis
     if conducteur_avec_avis == 'on':
         voyages_qs = voyages_qs.filter(nb_avis_conducteur__gt=0)
 
+    # Filtre date
     if date:
         voyages_qs = voyages_qs.filter(date_depart__date=date)
 
+    # Filtre villes
     if depart:
         voyages_qs = voyages_qs.filter(depart__iexact=depart)
     if arrivee:
         voyages_qs = voyages_qs.filter(arrivee__iexact=arrivee)
 
+    # Pagination
     paginator = Paginator(voyages_qs, 6)
     page_number = request.GET.get('page')
     voyages = paginator.get_page(page_number)
 
-    if request.is_ajax():
-        html = render_to_string('apps/home/_liste_voyages_partial.html', {'voyages': voyages, 'user': request.user})
-        return JsonResponse({'html': html})
-
-    # Pour la page complète initiale
+    # Pour la liste des villes dans les filtres
     villes_depart = Voyage.objects.values_list('depart', flat=True).distinct().order_by('depart')
     villes_arrivee = Voyage.objects.values_list('arrivee', flat=True).distinct().order_by('arrivee')
 
+    # Gestion Ajax
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # On rend directement le HTML complet de la liste des voyages
+        html = ""
+        for voyage in voyages:
+            html += render_to_string('apps/home/_single_voyage_card.html', {'voyage': voyage, 'user': request.user})
+        # On renvoie également les données de pagination si besoin
+        pagination_html = render_to_string('apps/home/_pagination.html', {'voyages': voyages})
+        return JsonResponse({'html': html, 'pagination_html': pagination_html})
+
+    # Page complète initiale
     return render(request, 'apps/home/liste-voyage.html', {
         'voyages': voyages,
         'villes_depart': villes_depart,
