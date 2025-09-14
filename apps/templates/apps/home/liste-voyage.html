@@ -12,7 +12,7 @@
         <div class="col-md-3 mb-4">
             <div class="card p-3 shadow-sm">
                 <h4>Filtres</h4>
-                <form method="get">
+                <form id="voyage-filter-form" method="get">
                     <!-- Ville de départ -->
                     <div class="mb-3">
                         <label class="form-label">Ville de départ</label>
@@ -56,15 +56,13 @@
                         <input class="form-check-input" type="checkbox" name="avec_avis" id="avec_avis" {% if request_get.avec_avis %}checked{% endif %}>
                         <label class="form-check-label" for="avec_avis">Uniquement les conducteurs avec avis</label>
                     </div>
-
-                    <button type="submit" class="btn btn-outline-success w-100">Rechercher</button>
                 </form>
             </div>
         </div>
 
         <!-- Liste des voyages (70%) -->
         <div class="col-md-9">
-            <div class="row">
+            <div class="row" id="voyages-container">
                 {% for voyage in voyages %}
                 <div class="col-12 mb-4">
                     <a href="{% url 'apps:voyages-single' voyage.id %}" class="text-decoration-none text-dark">
@@ -141,39 +139,69 @@
                 {% empty %}
                 <p class="text-muted">Aucun voyage disponible pour le moment.</p>
                 {% endfor %}
-            </div>
 
-            <!-- Pagination -->
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center mt-4">
-                    {% if voyages.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ voyages.previous_page_number }}" aria-label="Précédent">&laquo;</a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                    {% endif %}
-
-                    {% for num in voyages.paginator.page_range %}
-                        {% if voyages.number == num %}
-                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                        {% elif num >= voyages.number|add:-2 and num <= voyages.number|add:2 %}
-                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if voyages.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ voyages.previous_page_number }}" aria-label="Précédent">&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                         {% endif %}
-                    {% endfor %}
 
-                    {% if voyages.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ voyages.next_page_number }}" aria-label="Suivant">&raquo;</a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                    {% endif %}
-                </ul>
-            </nav>
+                        {% for num in voyages.paginator.page_range %}
+                            {% if voyages.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num >= voyages.number|add:-2 and num <= voyages.number|add:2 %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if voyages.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ voyages.next_page_number }}" aria-label="Suivant">&raquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock content %}
-{% block javascripts %}{% endblock javascripts %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    function loadVoyages() {
+        $.ajax({
+            url: "{% url 'apps:liste-voyages' %}",
+            data: $('#voyage-filter-form').serialize(),
+            dataType: 'json',
+            success: function(response) {
+                $('#voyages-container').html(response.html);
+            }
+        });
+    }
+
+    // Déclenchement au changement des filtres
+    $('#voyage-filter-form select, #voyage-filter-form input[type="checkbox"], #voyage-filter-form input[type="date"]').on('change', function() {
+        loadVoyages();
+    });
+
+    // Pagination dynamique
+    $(document).on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        $.get($(this).attr('href'), $('#voyage-filter-form').serialize(), function(response) {
+            $('#voyages-container').html(response.html);
+        }, 'json');
+    });
+});
+</script>
+{% endblock javascripts %}
+
