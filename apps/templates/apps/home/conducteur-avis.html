@@ -32,7 +32,7 @@
                     {% endif %}
 
                     <div style="margin-top:8px;">
-                        <small>Voyage : <a href="{% url 'apps:voyage-single' a.voyage.id %}">{{ a.voyage.titre }} — {{ a.voyage.depart }} → {{ a.voyage.arrivee }}</a></small>
+                        <small>Voyage : <a href="{% url 'apps:voyages-single' a.voyage.id %}">{{ a.voyage.titre }} — {{ a.voyage.depart }} → {{ a.voyage.arrivee }}</a></small>
                     </div>
                 </li>
             {% endfor %}
