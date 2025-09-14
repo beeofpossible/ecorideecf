@@ -28,6 +28,16 @@
             {% if voyage.conducteur.profilutilisateur.bio %}
                 <p>{{ voyage.conducteur.profilutilisateur.bio }}</p>
             {% endif %}
+            <!-- dans left-column, sous la bio / ou à l'endroit voulu -->
+<div class="note-moyenne" style="margin-top:10px;">
+    {% if moyenne_avis %}
+        <p><strong>Note moyenne :</strong> {{ moyenne_avis|floatformat:1 }} / 5 ⭐
+            — <a href="{% url 'conducteur_avis' voyage.conducteur.id %}">Voir tous les avis</a>
+        </p>
+    {% else %}
+        <p>Aucun avis pour ce conducteur — <a href="{% url 'conducteur_avis' voyage.conducteur.id %}">Voir la page des avis</a></p>
+    {% endif %}
+</div>
         </div>
 
         {% if voyage.conducteur.voitures.exists %}
