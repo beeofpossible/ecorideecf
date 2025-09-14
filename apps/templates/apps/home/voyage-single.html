@@ -32,7 +32,7 @@
 <div class="note-moyenne" style="margin-top:10px;">
     {% if moyenne_avis %}
         <p><strong>Note moyenne :</strong> {{ moyenne_avis|floatformat:1 }} / 5 ⭐
-            — <a href="{% url 'conducteur_avis' voyage.conducteur.id %}">Voir tous les avis</a>
+            — <a href="{% url 'apps:conducteur_avis' voyage.conducteur.id %}">Voir tous les avis</a>
         </p>
     {% else %}
         <p>Aucun avis pour ce conducteur — <a href="{% url 'apps:conducteur_avis' voyage.conducteur.id %}">Voir la page des avis</a></p>
