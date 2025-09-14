@@ -390,71 +390,60 @@ def geocode_city(city_name):
         return float(results[0]['lat']), float(results[0]['lon'])
     return None
         
-#Vitrine - Liste des voyages         
+#Vitrine - Liste des voyages
 def liste_voyages(request):
     site = Site.objects.first()
+
     voyages_qs = Voyage.objects.annotate(
         moyenne_avis=Avg('avis__note'),
         nb_avis_conducteur=Count('conducteur__voyages__avis')
     ).order_by('-date_depart')
 
+    # Récupération des valeurs uniques pour les filtres
+    villes_depart = Voyage.objects.values_list('depart', flat=True).distinct().order_by('depart')
+    villes_arrivee = Voyage.objects.values_list('arrivee', flat=True).distinct().order_by('arrivee')
+
     depart = request.GET.get('depart')
     arrivee = request.GET.get('arrivee')
     date = request.GET.get('date')
     ecologique = request.GET.get('ecologique')
-    rayon = request.GET.get('rayon')
-    conducteur_avec_avis = request.GET.get('conducteur_avec_avis')  # Nouveau filtre
+    conducteur_avec_avis = request.GET.get('avec_avis')
 
-    # Filtrer voyages écologiques ou non
-    if ecologique == 'on':
+    # Filtre par départ
+    if depart:
+        voyages_qs = voyages_qs.filter(depart=depart)
+
+    # Filtre par arrivée
+    if arrivee:
+        voyages_qs = voyages_qs.filter(arrivee=arrivee)
+
+    # Filtre par date
+    if date:
+        voyages_qs = voyages_qs.filter(date_depart__date=date)
+
+    # Filtre écologique
+    if ecologique == 'oui':
         voyages_qs = voyages_qs.filter(ecologique=True)
-    elif ecologique == 'off':
+    elif ecologique == 'non':
         voyages_qs = voyages_qs.filter(ecologique=False)
 
     # Filtrer uniquement voyages dont le conducteur a au moins un avis
     if conducteur_avec_avis == 'on':
-        # Garder que les voyages dont le conducteur a au moins un avis sur ses voyages
         voyages_qs = voyages_qs.filter(nb_avis_conducteur__gt=0)
 
-    if date:
-        voyages_qs = voyages_qs.filter(date_depart__date=date)
-
-    if depart and rayon:
-        rayon_km = float(rayon)
-        coords_depart = geocode_city(depart)
-        if coords_depart:
-            voyages_proches_ids = []
-            for voyage in voyages_qs:
-                coords_voyage = geocode_city(voyage.depart)
-                if coords_voyage:
-                    try:
-                        distance = geodesic(coords_depart, coords_voyage).km
-                        if distance <= rayon_km:
-                            voyages_proches_ids.append(voyage.id)
-                    except:
-                        pass
-            voyages_qs = voyages_qs.filter(id__in=voyages_proches_ids)
-
-    if arrivee:
-        voyages_qs = voyages_qs.filter(arrivee__icontains=arrivee)
-
-    note_min = request.GET.get('note_min')
-    if note_min:
-        try:
-            note_min = int(note_min)
-            if 1 <= note_min <= 5:
-                voyages_qs = voyages_qs.filter(moyenne_avis__gte=note_min)
-        except ValueError:
-            pass
-    
     paginator = Paginator(voyages_qs, 6)
     page_number = request.GET.get('page')
     voyages = paginator.get_page(page_number)
 
-    return render(request, 'apps/home/liste-voyage.html', {
+    context = {
         'voyages': voyages,
-        'site': site
-    })
+        'site': site,
+        'villes_depart': villes_depart,
+        'villes_arrivee': villes_arrivee,
+        'request_get': request.GET
+    }
+    return render(request, 'apps/home/liste-voyage.html', context)
+
 
 def voyage_single(request, voyage_id):
     site = Site.objects.first()
