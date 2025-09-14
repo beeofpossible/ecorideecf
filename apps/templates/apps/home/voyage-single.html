@@ -1,50 +1,39 @@
 {% extends "apps/layouts/base.html" %}
 {% load static %}
-<!-- Specific Page CSS goes HERE  -->
-<head>
-    <style>
-        @media screen and (max-width: 768px) {
-    .voyage-single-container {
-        flex-direction: column;
-    }
-    .left-column, .right-column {
-        max-width: 100%;
-    }
-}
-    </style>
-</head>
-{% block content %}
-<body>
 
+{% block content %}
 <div class="voyage-single-container" style="display: flex; gap: 40px; padding: 20px;">
 
-    <!-- Colonne gauche : Conducteur et véhicule -->
+    <!-- Colonne gauche -->
     <div class="left-column" style="flex: 1; max-width: 350px;">
         <div class="conducteur-card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center;">
             {% if voyage.conducteur.profilutilisateur.photo_profil %}
-                <img src="{{ voyage.conducteur.profilutilisateur.photo_profil.url }}" alt="{{ voyage.conducteur.username }}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;">
+                <img src="{{ voyage.conducteur.profilutilisateur.photo_profil.url }}" 
+                     alt="{{ voyage.conducteur.username }}" 
+                     style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;">
             {% endif %}
             <h3>{{ voyage.conducteur.username }}</h3>
             {% if voyage.conducteur.profilutilisateur.bio %}
                 <p>{{ voyage.conducteur.profilutilisateur.bio }}</p>
             {% endif %}
-            <!-- dans left-column, sous la bio / ou à l'endroit voulu -->
-<div class="note-moyenne" style="margin-top:10px;">
-    {% if moyenne_avis %}
-        <p><strong>Note moyenne :</strong> {{ moyenne_avis|floatformat:1 }} / 5 ⭐
-            — <a href="{% url 'apps:conducteur_avis' voyage.conducteur.id %}">Voir tous les avis</a>
-        </p>
-    {% else %}
-        <p>Aucun avis pour ce conducteur — <a href="{% url 'apps:conducteur_avis' voyage.conducteur.id %}">Voir la page des avis</a></p>
-    {% endif %}
-</div>
+
+            <div class="note-moyenne" style="margin-top:10px;">
+                {% if moyenne_avis %}
+                    <p><strong>Note moyenne :</strong> {{ moyenne_avis|floatformat:1 }} / 5 ⭐
+                        — <a href="{% url 'apps:conducteur_avis' voyage.conducteur.id %}">Voir tous les avis</a>
+                    </p>
+                {% else %}
+                    <p>Aucun avis — <a href="{% url 'apps:conducteur_avis' voyage.conducteur.id %}">Voir les avis</a></p>
+                {% endif %}
+            </div>
         </div>
 
         {% if voyage.conducteur.voitures.exists %}
         <div class="voiture-card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-top: 20px; text-align: center;">
             {% with voiture=voyage.conducteur.voitures.first %}
                 {% if voiture.photo %}
-                    <img src="{{ voiture.photo.url }}" alt="{{ voiture.marque }} {{ voiture.modele }}" style="width: 100%; border-radius: 10px; object-fit: cover; margin-bottom: 10px;">
+                    <img src="{{ voiture.photo.url }}" alt="{{ voiture.marque }} {{ voiture.modele }}" 
+                         style="width: 100%; border-radius: 10px; object-fit: cover; margin-bottom: 10px;">
                 {% endif %}
                 <h4>{{ voiture.marque }} {{ voiture.modele }}</h4>
                 <p>Immatriculation : {{ voiture.immatriculation }}</p>
@@ -55,52 +44,48 @@
         {% endif %}
     </div>
 
-    <!-- Colonne droite : Détails du voyage -->
-    <!-- Colonne droite : Détails du voyage -->
-<div class="right-column" style="flex: 2; display: flex; flex-direction: column; gap: 20px;">
+    <!-- Colonne droite -->
+    <div class="right-column" style="flex: 2; display: flex; flex-direction: column; gap: 20px;">
 
-    <div class="voyage-details" style="border: 1px solid #ddd; border-radius: 10px; padding: 30px;">
-        <h2>{{ voyage.titre }}</h2>
-        <p><strong>Départ :</strong> {{ voyage.depart }}</p>
-        <p><strong>Arrivée :</strong> {{ voyage.arrivee }}</p>
-        <p><strong>Date :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}</p>
-        <p><strong>Places restantes :</strong> {{ voyage.nb_places_restantes }}</p>
-        <p><strong>Prix :</strong> {{ voyage.prix }} €</p>
-        <p><strong>Écologique :</strong> {% if voyage.ecologique %}Oui{% else %}Non{% endif %}</p>
-        <p><strong>État :</strong> {{ voyage.get_etat_display }}</p>
-        <p>{{ voyage.description }}</p>
+        <div class="voyage-details" style="border: 1px solid #ddd; border-radius: 10px; padding: 30px;">
+            <h2>{{ voyage.titre }}</h2>
+            <p><strong>Départ :</strong> {{ voyage.depart }}</p>
+            <p><strong>Arrivée :</strong> {{ voyage.arrivee }}</p>
+            <p><strong>Date :</strong> {{ voyage.date_depart|date:"d/m/Y H:i" }}</p>
+            <p><strong>Places restantes :</strong> {{ voyage.nb_places_restantes }}</p>
+            <p><strong>Prix :</strong> {{ voyage.prix }} €</p>
+            <p><strong>Écologique :</strong> {% if voyage.ecologique %}Oui{% else %}Non{% endif %}</p>
+            <p><strong>État :</strong> {{ voyage.get_etat_display }}</p>
+            <p>{{ voyage.description }}</p>
 
-        <form method="post" action="{% url 'apps:reserver_voyage' voyage.id %}">
-            {% csrf_token %}
-            <button type="submit" style="background-color: #007BFF; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                Réserver
-            </button>
-        </form>
+            <form method="post" action="{% url 'apps:reserver_voyage' voyage.id %}">
+                {% csrf_token %}
+                <button type="submit" style="background-color: #007BFF; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Réserver
+                </button>
+            </form>
+        </div>
+
+        <!-- Carte -->
+        {% if coords_depart and coords_arrivee %}
+        <div id="map" style="height: 400px; border-radius: 10px; overflow: hidden;"></div>
+
+        <div style="margin-top: 10px; font-size: 1.1em;">
+            <p><strong>Distance :</strong> {{ distance_km }} km</p>
+            <p><strong>Durée estimée :</strong> {{ duree_h }} h</p>
+        </div>
+        {% endif %}
     </div>
-
-    <!-- Carte -->
-    {% if coords_depart and coords_arrivee %}
-    <div id="map" style="height: 400px; border-radius: 10px; overflow: hidden;"></div>
-
-    <div style="margin-top: 10px; font-size: 1.1em;">
-        <p><strong>Distance :</strong> {{ distance_km }} km</p>
-        <p><strong>Durée estimée :</strong> {{ duree_h }} h</p>
-    </div>
-    {% endif %}
-</div>
-
-<!-- Scripts Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-
-
-
 </div>
 {% endblock %}
 
-<!-- Specific Page JS goes HERE  -->
+{% block extra_scripts %}
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
 <script>
-    {% if coords_depart and coords_arrivee %}
+{% if coords_depart and coords_arrivee %}
     var map = L.map('map').setView([{{ coords_depart.0 }}, {{ coords_depart.1 }}], 6);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -117,5 +102,7 @@
         [{{ coords_arrivee.0 }}, {{ coords_arrivee.1 }}]
     ]);
     map.fitBounds(bounds);
-    {% endif %}
+{% endif %}
 </script>
+{% endblock %}
+
