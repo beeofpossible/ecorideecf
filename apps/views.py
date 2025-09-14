@@ -3,6 +3,7 @@ from .models import Voyage, Reservation, Site, Page, PresentationUtilisateur, Te
 from .models import ProfilUtilisateur, Message, Litige, Avi, Voiture, Facture, Credit, MoyenPaiement
 from .forms import VoyageForm, ConnexionForm, InscriptionForm,MessageForm,MoyenPaiementForm, LitigeForm
 from .forms import MessageLitigeForm, RoleForm
+from django.template.loader import render_to_string
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login,update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -393,15 +394,10 @@ def geocode_city(city_name):
 #Vitrine - Liste des voyages
 def liste_voyages(request):
     site = Site.objects.first()
-
     voyages_qs = Voyage.objects.annotate(
         moyenne_avis=Avg('avis__note'),
         nb_avis_conducteur=Count('conducteur__voyages__avis')
     ).order_by('-date_depart')
-
-    # Récupération des valeurs uniques pour les filtres
-    villes_depart = Voyage.objects.values_list('depart', flat=True).distinct().order_by('depart')
-    villes_arrivee = Voyage.objects.values_list('arrivee', flat=True).distinct().order_by('arrivee')
 
     depart = request.GET.get('depart')
     arrivee = request.GET.get('arrivee')
@@ -409,40 +405,41 @@ def liste_voyages(request):
     ecologique = request.GET.get('ecologique')
     conducteur_avec_avis = request.GET.get('avec_avis')
 
-    # Filtre par départ
-    if depart:
-        voyages_qs = voyages_qs.filter(depart=depart)
-
-    # Filtre par arrivée
-    if arrivee:
-        voyages_qs = voyages_qs.filter(arrivee=arrivee)
-
-    # Filtre par date
-    if date:
-        voyages_qs = voyages_qs.filter(date_depart__date=date)
-
-    # Filtre écologique
     if ecologique == 'oui':
         voyages_qs = voyages_qs.filter(ecologique=True)
     elif ecologique == 'non':
         voyages_qs = voyages_qs.filter(ecologique=False)
 
-    # Filtrer uniquement voyages dont le conducteur a au moins un avis
     if conducteur_avec_avis == 'on':
         voyages_qs = voyages_qs.filter(nb_avis_conducteur__gt=0)
+
+    if date:
+        voyages_qs = voyages_qs.filter(date_depart__date=date)
+
+    if depart:
+        voyages_qs = voyages_qs.filter(depart__iexact=depart)
+    if arrivee:
+        voyages_qs = voyages_qs.filter(arrivee__iexact=arrivee)
 
     paginator = Paginator(voyages_qs, 6)
     page_number = request.GET.get('page')
     voyages = paginator.get_page(page_number)
 
-    context = {
+    if request.is_ajax():
+        html = render_to_string('apps/home/_liste_voyages_partial.html', {'voyages': voyages, 'user': request.user})
+        return JsonResponse({'html': html})
+
+    # Pour la page complète initiale
+    villes_depart = Voyage.objects.values_list('depart', flat=True).distinct().order_by('depart')
+    villes_arrivee = Voyage.objects.values_list('arrivee', flat=True).distinct().order_by('arrivee')
+
+    return render(request, 'apps/home/liste-voyage.html', {
         'voyages': voyages,
-        'site': site,
         'villes_depart': villes_depart,
         'villes_arrivee': villes_arrivee,
-        'request_get': request.GET
-    }
-    return render(request, 'apps/home/liste-voyage.html', context)
+        'site': site,
+        'request_get': request.GET,
+    })
 
 
 def voyage_single(request, voyage_id):
