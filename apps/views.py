@@ -456,8 +456,23 @@ def liste_voyages(request):
         'site': site
     })
 
-def voyage_single(request):
-    return render(request, "apps/home/voyage-single.html")
+def voyage_single(request, voyage_id):
+    site = Site.objects.first()
+    voyage = get_object_or_404(Voyage, id=voyage_id)
+
+    # Récupération du profil conducteur
+    profil_conducteur = ProfilUtilisateur.objects.filter(utilisateur=voyage.conducteur).first()
+
+    # Récupération de la voiture (première associée au conducteur)
+    voiture = voyage.conducteur.voitures.first()
+
+    context = {
+        "voyage": voyage,
+        "profil_conducteur": profil_conducteur,
+        "voiture": voiture,
+        "site": site,
+    }
+    return render(request, "apps/home/voyage-single.html", context)
 
 #Vitrine - Réserver un voyage (connexion obligatoire)
 def reserver_voyage(request, voyage_id):
