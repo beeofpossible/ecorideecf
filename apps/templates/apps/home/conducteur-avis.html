@@ -1,0 +1,59 @@
+{% extends "apps/layouts/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container" style="padding:20px; max-width:1000px; margin:0 auto;">
+    <header style="display:flex; align-items:center; gap:16px;">
+        <h1>Avis — {{ conducteur.username }}</h1>
+        {% if moyenne_avis %}
+            <div style="margin-left:12px;">
+                <strong>Note moyenne :</strong> {{ moyenne_avis|floatformat:1 }} / 5 ⭐
+            </div>
+        {% else %}
+            <div style="margin-left:12px;color:#666;">Pas encore d'avis</div>
+        {% endif %}
+    </header>
+
+    <hr>
+
+    {% if avis %}
+        <ul style="list-style:none; padding:0;">
+            {% for a in avis %}
+                <li style="padding:16px; border:1px solid #eee; border-radius:8px; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>{{ a.auteur.username }}</strong>
+                            <span style="margin-left:8px;">— {{ a.note }} ⭐</span>
+                        </div>
+                        <div style="font-size:0.9em; color:#666;">{{ a.date|date:"d/m/Y H:i" }}</div>
+                    </div>
+
+                    {% if a.commentaire %}
+                        <p style="margin-top:8px;">{{ a.commentaire }}</p>
+                    {% endif %}
+
+                    <div style="margin-top:8px;">
+                        <small>Voyage : <a href="{% url 'voyage_single' a.voyage.id %}">{{ a.voyage.titre }} — {{ a.voyage.depart }} → {{ a.voyage.arrivee }}</a></small>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Pagination -->
+        <div style="display:flex; justify-content:center; gap:8px; margin-top:16px;">
+            {% if avis.has_previous %}
+                <a href="?page={{ avis.previous_page_number }}">← Précédent</a>
+            {% endif %}
+
+            <span>Page {{ avis.number }} / {{ avis.paginator.num_pages }}</span>
+
+            {% if avis.has_next %}
+                <a href="?page={{ avis.next_page_number }}">Suivant →</a>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <p>Aucun avis publié pour ce conducteur.</p>
+    {% endif %}
+
+</div>
+{% endblock %}
