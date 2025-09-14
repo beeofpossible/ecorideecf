@@ -460,22 +460,35 @@ def voyage_single(request, voyage_id):
     site = Site.objects.first()
     voyage = get_object_or_404(Voyage, id=voyage_id)
 
-    # Récupération du profil conducteur
     profil_conducteur = ProfilUtilisateur.objects.filter(utilisateur=voyage.conducteur).first()
-
-    # Récupération de la voiture (première associée au conducteur)
     voiture = voyage.conducteur.voitures.first()
-    moyenne_avis = Avi.objects.filter(voyage__conducteur=voyage.conducteur, est_affiche=True).aggregate(avg=Avg('note'))['avg']
+    moyenne_avis = Avi.objects.filter(
+        voyage__conducteur=voyage.conducteur, est_affiche=True
+    ).aggregate(avg=Avg("note"))["avg"]
+
+    # Géocodage départ / arrivée
+    coords_depart = geocode_city(voyage.depart)
+    coords_arrivee = geocode_city(voyage.arrivee)
+
+    distance_km = None
+    duree_h = None
+    if coords_depart and coords_arrivee:
+        distance_km = geodesic(coords_depart, coords_arrivee).km
+        # Estimation durée (80 km/h)
+        duree_h = distance_km / 80
 
     context = {
         "voyage": voyage,
         "profil_conducteur": profil_conducteur,
         "voiture": voiture,
         "moyenne_avis": moyenne_avis,
+        "coords_depart": coords_depart,
+        "coords_arrivee": coords_arrivee,
+        "distance_km": round(distance_km, 1) if distance_km else None,
+        "duree_h": round(duree_h, 1) if duree_h else None,
         "site": site,
     }
     return render(request, "apps/home/voyage-single.html", context)
-
 Toujours dans apps/views.py :
 
 def conducteur_avis(request, conducteur_id):
