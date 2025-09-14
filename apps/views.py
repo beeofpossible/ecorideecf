@@ -399,6 +399,11 @@ from django.db.models import Avg, Count
 from .models import Voyage, Site
 
 # Vitrine - Liste des voyages
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from django.db.models import Avg, Count
+from .models import Voyage, Site
+
 def liste_voyages(request):
     site = Site.objects.first()
     
@@ -444,17 +449,7 @@ def liste_voyages(request):
     villes_depart = Voyage.objects.values_list('depart', flat=True).distinct().order_by('depart')
     villes_arrivee = Voyage.objects.values_list('arrivee', flat=True).distinct().order_by('arrivee')
 
-    # Gestion Ajax
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        # On rend directement le HTML complet de la liste des voyages
-        html = ""
-        for voyage in voyages:
-            html += render_to_string('apps/home/_single_voyage_card.html', {'voyage': voyage, 'user': request.user})
-        # On renvoie également les données de pagination si besoin
-        pagination_html = render_to_string('apps/home/_pagination.html', {'voyages': voyages})
-        return JsonResponse({'html': html, 'pagination_html': pagination_html})
-
-    # Page complète initiale
+    # On renvoie toujours la page complète
     return render(request, 'apps/home/liste-voyage.html', {
         'voyages': voyages,
         'villes_depart': villes_depart,
