@@ -16,6 +16,8 @@ urlpatterns = [
     path('covoiturage/<int:voyage_id>/reserver/', views.reserver_voyage, name='reserver_voyage'),
     path('covoiturage/créer', views.creer_voyage, name='creer-voyage'), 
     path('covoiturages/', views.mes_voyages, name='mes_voyages'),
+    path("conducteur/<int:conducteur_id>/avis/", views.conducteur_avis, name="conducteur_avis"),
+
     path('voyage/<int:voyage_id>/demarrer/', views.demarrer_voyage, name='demarrer_voyage'),
     path('voyage/<int:voyage_id>/terminer/', views.terminer_voyage, name='terminer_voyage'),
     path('acheter-credits/', views.acheter_credits, name='acheter_credits'),
