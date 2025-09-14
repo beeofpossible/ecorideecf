@@ -489,7 +489,6 @@ def voyage_single(request, voyage_id):
         "site": site,
     }
     return render(request, "apps/home/voyage-single.html", context)
-Toujours dans apps/views.py :
 
 def conducteur_avis(request, conducteur_id):
     site = Site.objects.first()
