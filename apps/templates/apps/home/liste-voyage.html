@@ -83,8 +83,7 @@
 
                             <div class="d-flex justify-content-between align-items-center flex-wrap">
                                 <div class="d-flex align-items-center flex-wrap gap-3">
-                                    <img src="{%static'img/autoroute.png'%}" 
-                                         alt="Profil" class="rounded-circle me-2" style="width:40px; height:40px;">
+                                    <img src="{% static 'img/autoroute.png' %}" alt="Profil" class="rounded-circle me-2" style="width:40px; height:40px;">
                                     <div>
                                         <strong>{{ voyage.conducteur.username }}</strong><br>
                                         {% if voyage.moyenne_avis %}
