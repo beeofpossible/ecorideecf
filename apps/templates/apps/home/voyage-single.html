@@ -1,6 +1,8 @@
 {% extends "apps/layouts/base.html" %}
 {% load static %}
-
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+</head>
 {% block content %}
 <div class="voyage-single-container" style="display: flex; gap: 40px; padding: 20px;">
 
@@ -77,11 +79,8 @@
         {% endif %}
     </div>
 </div>
-{% endblock %}
 
-{% block extra_scripts %}
 <!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
 <script>
