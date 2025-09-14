@@ -465,14 +465,41 @@ def voyage_single(request, voyage_id):
 
     # Récupération de la voiture (première associée au conducteur)
     voiture = voyage.conducteur.voitures.first()
+    moyenne_avis = Avi.objects.filter(voyage__conducteur=voyage.conducteur, est_affiche=True).aggregate(avg=Avg('note'))['avg']
 
     context = {
         "voyage": voyage,
         "profil_conducteur": profil_conducteur,
         "voiture": voiture,
+        "moyenne_avis": moyenne_avis,
         "site": site,
     }
     return render(request, "apps/home/voyage-single.html", context)
+
+Toujours dans apps/views.py :
+
+def conducteur_avis(request, conducteur_id):
+    site = Site.objects.first()
+    conducteur = get_object_or_404(User, id=conducteur_id)
+
+    # Tous les avis publiés pour les voyages du conducteur (triés du plus récent)
+    avis_qs = Avi.objects.filter(voyage__conducteur=conducteur, est_affiche=True).select_related('auteur', 'voyage').order_by('-date')
+
+    # Moyenne (réutilisable ici aussi)
+    moyenne_avis = avis_qs.aggregate(avg=Avg('note'))['avg']
+
+    # Pagination
+    paginator = Paginator(avis_qs, 10)  # 10 avis par page
+    page_number = request.GET.get('page')
+    avis = paginator.get_page(page_number)
+
+    context = {
+        "conducteur": conducteur,
+        "avis": avis,
+        "moyenne_avis": moyenne_avis,
+        "site": site,
+    }
+    return render(request, "apps/home/conducteur-avis.html", context)
 
 #Vitrine - Réserver un voyage (connexion obligatoire)
 def reserver_voyage(request, voyage_id):
